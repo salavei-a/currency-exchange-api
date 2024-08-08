@@ -1,58 +1,34 @@
 package com.asalavei.currencyexchange.api.controllers;
 
+import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
+import com.asalavei.currencyexchange.api.json.converters.JsonCurrencyConverter;
+import com.asalavei.currencyexchange.api.json.converters.JsonDtoConverter;
+import com.asalavei.currencyexchange.api.services.CrudService;
+import com.asalavei.currencyexchange.api.services.CurrencyService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class CurrencyServlet extends HttpServlet {
+    private final CrudService<Integer, Currency> service = new CurrencyService();
+    private final JsonDtoConverter<Integer, JsonCurrency, Currency> converter = new JsonCurrencyConverter();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Collection<Currency> dtoCurrencies = service.findAll();
+        Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
 
-        try {
-            Connection connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/currency_exchange",
-                    "postgres", ""
-            );
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonCurrencyAsString = objectMapper.writeValueAsString(jsonCurrencies);
 
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * from currencies");
-
-            List<JsonCurrency> currencies = new ArrayList<>();
-
-            while (resultSet.next()) {
-                JsonCurrency jsonCurrency = JsonCurrency.builder()
-                        .id(resultSet.getInt("id"))
-                        .code(resultSet.getString("code"))
-                        .fullName(resultSet.getString("full_name"))
-                        .sign(resultSet.getString("sign"))
-                        .build();
-
-                currencies.add(jsonCurrency);
-            }
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonCurrencyAsString = objectMapper.writeValueAsString(currencies);
-
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(jsonCurrencyAsString);
-
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonCurrencyAsString);
     }
 
     @Override
