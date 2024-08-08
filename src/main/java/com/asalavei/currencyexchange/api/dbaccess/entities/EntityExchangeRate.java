@@ -5,19 +5,10 @@ import java.math.BigDecimal;
 /**
  * Entity representing exchange rate data stored in the database
  */
-public class EntityExchangeRate {
-    private Integer id;
+public class EntityExchangeRate extends BaseEntity<Integer> {
     private Integer baseCurrencyId;
     private Integer targetCurrencyId;
     private BigDecimal rate;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public Integer getBaseCurrencyId() {
         return baseCurrencyId;
