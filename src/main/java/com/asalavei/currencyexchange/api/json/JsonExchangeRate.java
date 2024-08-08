@@ -5,19 +5,10 @@ import java.math.BigDecimal;
 /**
  * DTO representing exchange rate data that can be serialized to and deserialized from JSON
  */
-public class JsonExchangeRate {
-    private Integer id;
+public class JsonExchangeRate extends BaseJsonDto<Integer> {
     private Integer baseCurrencyId;
     private Integer targetCurrencyId;
     private BigDecimal rate;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public Integer getBaseCurrencyId() {
         return baseCurrencyId;

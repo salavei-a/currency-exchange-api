@@ -3,19 +3,10 @@ package com.asalavei.currencyexchange.api.json;
 /**
  * DTO representing currency data that can be serialized to and deserialized from JSON
  */
-public class JsonCurrency {
-    private Integer id;
+public class JsonCurrency extends BaseJsonDto<Integer> {
     private String code;
     private String fullName;
     private String sign;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getCode() {
         return code;
