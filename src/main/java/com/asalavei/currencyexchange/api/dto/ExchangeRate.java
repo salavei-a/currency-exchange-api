@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * Immutable DTO for transferring exchange rate data between business logic layers
  */
-public class ExchangeRate {
+public class ExchangeRate implements BaseDto<Integer> {
     private final Integer id;
     private final Integer baseCurrencyId;
     private final Integer targetCurrencyId;
