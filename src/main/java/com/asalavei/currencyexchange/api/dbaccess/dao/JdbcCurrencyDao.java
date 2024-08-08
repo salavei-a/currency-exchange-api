@@ -1,6 +1,7 @@
 package com.asalavei.currencyexchange.api.dbaccess.dao;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
+import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,17 +13,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
         List<EntityCurrency> currencies = new ArrayList<>();
 
         try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            Connection connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/currency_exchange",
-                    "postgres", ""
-            );
-
+            Connection connection = ConnectionUtil.getConnection();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * from currencies");
 
@@ -39,7 +30,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
 
             statement.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         return currencies;
