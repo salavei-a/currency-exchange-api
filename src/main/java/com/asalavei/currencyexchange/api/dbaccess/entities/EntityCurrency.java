@@ -1,4 +1,4 @@
-package com.asalavei.currencyexchange.api.dao.entities;
+package com.asalavei.currencyexchange.api.dbaccess.entities;
 
 /**
  * Entity representing currency data stored in the database

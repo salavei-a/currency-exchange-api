@@ -1,6 +1,6 @@
-package com.asalavei.currencyexchange.api.dao.converters;
+package com.asalavei.currencyexchange.api.dbaccess.converters;
 
-import com.asalavei.currencyexchange.api.dao.entities.EntityCurrency;
+import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dto.Currency;
 
 /**

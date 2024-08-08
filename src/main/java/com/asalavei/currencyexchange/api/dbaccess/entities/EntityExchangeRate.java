@@ -1,4 +1,4 @@
-package com.asalavei.currencyexchange.api.dao.entities;
+package com.asalavei.currencyexchange.api.dbaccess.entities;
 
 import java.math.BigDecimal;
 
