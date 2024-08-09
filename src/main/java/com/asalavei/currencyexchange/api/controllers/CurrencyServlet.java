@@ -20,15 +20,31 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Collection<Currency> dtoCurrencies = service.findAll();
-        Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
+        String pathInfo = request.getPathInfo();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonCurrencyAsString = objectMapper.writeValueAsString(jsonCurrencies);
+        if (pathInfo != null) {
+            String code = pathInfo.substring(1);
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(jsonCurrencyAsString);
+            Currency dtoCurrency = service.findByCode(code);
+            JsonCurrency jsonCurrency = converter.toJsonDto(dtoCurrency);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonCurrencyAsString = objectMapper.writeValueAsString(jsonCurrency);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(jsonCurrencyAsString);
+        } else {
+            Collection<Currency> dtoCurrencies = service.findAll();
+            Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonCurrencyAsString = objectMapper.writeValueAsString(jsonCurrencies);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(jsonCurrencyAsString);
+        }
     }
 
     @Override
