@@ -9,6 +9,23 @@ import java.util.List;
 
 public class JdbcCurrencyDao implements CurrencyDao {
     @Override
+    public void save(EntityCurrency entity) {
+        try (Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "INSERT INTO currencies (code, full_name, sign) VALUES (?, ?, ?)"
+             )) {
+
+            preparedStatement.setString(1, entity.getCode());
+            preparedStatement.setString(2, entity.getFullName());
+            preparedStatement.setString(3, entity.getSign());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public List<EntityCurrency> findAll() {
         List<EntityCurrency> currencies = new ArrayList<>();
 
