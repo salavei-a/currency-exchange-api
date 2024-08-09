@@ -6,4 +6,6 @@ import java.util.Collection;
 
 public interface BaseEntityDao<I extends Comparable<I>, E extends BaseEntity<I>> {
     Collection<E> findAll();
+
+    E findByCode(String code);
 }
