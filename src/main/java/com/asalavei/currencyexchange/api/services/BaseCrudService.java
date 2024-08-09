@@ -23,6 +23,11 @@ public abstract class BaseCrudService<I extends Comparable<I>,
     }
 
     @Override
+    public void save(D dto) {
+        entityDao.save(converter.toEntity(dto));
+    }
+
+    @Override
     public Collection<D> findAll() {
         return entityDao.findAll().stream().map(converter::toDto).collect(Collectors.toList());
     }
