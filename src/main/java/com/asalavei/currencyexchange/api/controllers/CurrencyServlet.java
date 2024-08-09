@@ -12,38 +12,53 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 
 public class CurrencyServlet extends HttpServlet {
     private final CrudService<Integer, Currency> service = new CurrencyService();
     private final JsonDtoConverter<Integer, JsonCurrency, Currency> converter = new JsonCurrencyConverter();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
 
         if (pathInfo != null) {
-            String code = pathInfo.substring(1);
-
-            Currency dtoCurrency = service.findByCode(code);
-            JsonCurrency jsonCurrency = converter.toJsonDto(dtoCurrency);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonCurrencyAsString = objectMapper.writeValueAsString(jsonCurrency);
-
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(jsonCurrencyAsString);
+            handleGetCurrencyByCode(response, pathInfo);
         } else {
-            Collection<Currency> dtoCurrencies = service.findAll();
-            Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
+            handleGetAllCurrencies(response);
+        }
+    }
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonCurrencyAsString = objectMapper.writeValueAsString(jsonCurrencies);
+    private void handleGetCurrencyByCode(HttpServletResponse response, String pathInfo) {
+        String code = pathInfo.substring(1);
+        Currency dtoCurrency = service.findByCode(code);
+        JsonCurrency jsonCurrency = converter.toJsonDto(dtoCurrency);
+
+        writeResponse(response, jsonCurrency);
+    }
+
+    private void handleGetAllCurrencies(HttpServletResponse response) {
+        Collection<Currency> dtoCurrencies = service.findAll();
+        Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
+
+        writeResponse(response, jsonCurrencies);
+    }
+
+
+    private <T> void writeResponse(HttpServletResponse response, T responseObject) {
+        try {
+            String jsonCurrencyAsString = objectMapper.writeValueAsString(responseObject);
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(jsonCurrencyAsString);
+
+            try (PrintWriter writer = response.getWriter()) {
+                writer.write(jsonCurrencyAsString);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
