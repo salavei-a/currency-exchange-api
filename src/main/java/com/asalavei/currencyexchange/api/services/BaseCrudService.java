@@ -26,4 +26,10 @@ public abstract class BaseCrudService<I extends Comparable<I>,
     public Collection<D> findAll() {
         return entityDao.findAll().stream().map(converter::toDto).collect(Collectors.toList());
     }
+
+    @Override
+    public D findByCode(String code) {
+        E entity = entityDao.findByCode(code);
+        return converter.toDto(entity);
+    }
 }
