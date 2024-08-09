@@ -13,8 +13,8 @@ public class JdbcCurrencyDao implements CurrencyDao {
         List<EntityCurrency> currencies = new ArrayList<>();
 
         try (Connection connection = ConnectionUtil.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM currencies")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies");
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 EntityCurrency entityCurrency = EntityCurrency.builder()
@@ -39,11 +39,13 @@ public class JdbcCurrencyDao implements CurrencyDao {
         EntityCurrency entityCurrency = null;
 
         try (Connection connection = ConnectionUtil.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM currencies WHERE code = '" + code + "'")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies WHERE code = ?")) {
+
+            preparedStatement.setString(1, code);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                entityCurrency = entityCurrency.builder()
+                entityCurrency = EntityCurrency.builder()
                         .id(resultSet.getInt("id"))
                         .code(resultSet.getString("code"))
                         .fullName(resultSet.getString("full_name"))
