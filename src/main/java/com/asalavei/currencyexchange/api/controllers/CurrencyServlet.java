@@ -31,6 +31,31 @@ public class CurrencyServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JsonCurrency jsonCurrency = JsonCurrency.builder()
+                .code(request.getParameter("code"))
+                .fullName(request.getParameter("full_name"))
+                .sign(request.getParameter("sign"))
+                .build();
+
+        Currency dtoCurrency = converter.toDto(jsonCurrency);
+
+        try {
+            service.save(dtoCurrency);
+
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"message\":\"Currency created successfully\"}");
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\":\"An error occurred while saving the currency\"}");
+        }
+    }
+
     private void handleGetCurrencyByCode(HttpServletResponse response, String pathInfo) {
         String code = pathInfo.substring(1);
         Currency dtoCurrency = service.findByCode(code);
@@ -60,9 +85,5 @@ public class CurrencyServlet extends HttpServlet {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
     }
 }
