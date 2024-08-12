@@ -1,6 +1,9 @@
 package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dto.Currency;
+import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
+import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
+import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.converters.JsonCurrencyConverter;
 import com.asalavei.currencyexchange.api.json.converters.JsonDtoConverter;
@@ -21,13 +24,36 @@ public class CurrencyServlet extends HttpServlet {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
 
-        if (pathInfo != null) {
-            handleGetCurrencyByCode(response, pathInfo);
-        } else {
-            handleGetAllCurrencies(response);
+        if (pathInfo != null && pathInfo.equals("/")) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeErrorResponse(response, "Currency code is missing in the URL request.");
+        }
+
+        try {
+            if (pathInfo == null) {
+                handleGetAllCurrencies(response);
+            } else {
+                handleGetCurrencyByCode(response, pathInfo);
+            }
+        } catch (CENotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            writeErrorResponse(response, e.getMessage());
+        } catch (CEDatabaseUnavailableException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            writeErrorResponse(response, e.getMessage());
+        }
+    }
+
+    private static void writeErrorResponse(HttpServletResponse response, String errorMessage) {
+        try (PrintWriter writer = response.getWriter()) {
+            response.setContentType(("application/json"));
+            response.setCharacterEncoding("UTF-8");
+            writer.write(errorMessage);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -39,20 +65,24 @@ public class CurrencyServlet extends HttpServlet {
                 .sign(request.getParameter("sign"))
                 .build();
 
+        if (jsonCurrency.getCode() == null || jsonCurrency.getFullName() == null || jsonCurrency.getSign() == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            writeErrorResponse(response, "Required form field is missing.");
+        }
+
         Currency dtoCurrency = converter.toDto(jsonCurrency);
 
         try {
-            service.save(dtoCurrency);
+            Currency savedDto = service.create(dtoCurrency);
 
             response.setStatus(HttpServletResponse.SC_CREATED);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"message\":\"Currency created successfully\"}");
-        } catch (Exception e) {
+            writeResponse(response, "Currency created successfully.", savedDto);
+        } catch (CEAlreadyExists e) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            writeErrorResponse(response, e.getMessage());
+        } catch (CEDatabaseUnavailableException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"error\":\"An error occurred while saving the currency\"}");
+            writeErrorResponse(response, e.getMessage());
         }
     }
 
@@ -69,6 +99,21 @@ public class CurrencyServlet extends HttpServlet {
         Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
 
         writeResponse(response, jsonCurrencies);
+    }
+
+    private <T> void writeResponse(HttpServletResponse response, String message, T responseObject) {
+        try {
+            String jsonString = objectMapper.writeValueAsString(responseObject);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try (PrintWriter writer = response.getWriter()) {
+                writer.write(message + "\n" + jsonString);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
