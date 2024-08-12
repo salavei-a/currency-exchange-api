@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public interface CurrencyDao extends BaseEntityDao<Integer, EntityCurrency> {
     @Override
-    void save(EntityCurrency entity);
+    EntityCurrency save(EntityCurrency entity);
 
     @Override
     Collection<EntityCurrency> findAll();
