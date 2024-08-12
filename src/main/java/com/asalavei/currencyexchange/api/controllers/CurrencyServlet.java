@@ -24,12 +24,12 @@ public class CurrencyServlet extends HttpServlet {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
 
-        if (pathInfo != null && pathInfo.equals("/")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeErrorResponse(response, "Currency code is missing in the URL request.");
+        if ("/".equals(pathInfo)) {
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Currency code is missing in the URL request.", null);
+            return;
         }
 
         try {
@@ -39,26 +39,14 @@ public class CurrencyServlet extends HttpServlet {
                 handleGetCurrencyByCode(response, pathInfo);
             }
         } catch (CENotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            writeErrorResponse(response, e.getMessage());
+            writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
         } catch (CEDatabaseUnavailableException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            writeErrorResponse(response, e.getMessage());
-        }
-    }
-
-    private static void writeErrorResponse(HttpServletResponse response, String errorMessage) {
-        try (PrintWriter writer = response.getWriter()) {
-            response.setContentType(("application/json"));
-            response.setCharacterEncoding("UTF-8");
-            writer.write(errorMessage);
-        } catch (IOException e) {
-            e.printStackTrace();
+            writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         JsonCurrency jsonCurrency = JsonCurrency.builder()
                 .code(request.getParameter("code"))
                 .fullName(request.getParameter("full_name"))
@@ -66,23 +54,19 @@ public class CurrencyServlet extends HttpServlet {
                 .build();
 
         if (jsonCurrency.getCode() == null || jsonCurrency.getFullName() == null || jsonCurrency.getSign() == null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeErrorResponse(response, "Required form field is missing.");
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Required form field is missing.", null);
+            return;
         }
 
         Currency dtoCurrency = converter.toDto(jsonCurrency);
 
         try {
-            Currency savedDto = service.create(dtoCurrency);
-
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            writeResponse(response, "Currency created successfully.", savedDto);
+            JsonCurrency savedJsonCurrency = converter.toJsonDto(service.create(dtoCurrency));
+            writeJsonResponse(response, HttpServletResponse.SC_CREATED, null, savedJsonCurrency);
         } catch (CEAlreadyExists e) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            writeErrorResponse(response, e.getMessage());
+            writeJsonResponse(response, HttpServletResponse.SC_CONFLICT, e.getMessage(), null);
         } catch (CEDatabaseUnavailableException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            writeErrorResponse(response, e.getMessage());
+            writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }
 
@@ -91,41 +75,28 @@ public class CurrencyServlet extends HttpServlet {
         Currency dtoCurrency = service.findByCode(code);
         JsonCurrency jsonCurrency = converter.toJsonDto(dtoCurrency);
 
-        writeResponse(response, jsonCurrency);
+        writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonCurrency);
     }
 
     private void handleGetAllCurrencies(HttpServletResponse response) {
         Collection<Currency> dtoCurrencies = service.findAll();
         Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
 
-        writeResponse(response, jsonCurrencies);
+        writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonCurrencies);
     }
 
-    private <T> void writeResponse(HttpServletResponse response, String message, T responseObject) {
+    private <T> void writeJsonResponse(HttpServletResponse response, int statusCode, String errorMessage, T responseObject) {
         try {
-            String jsonString = objectMapper.writeValueAsString(responseObject);
-
+            response.setStatus(statusCode);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
             try (PrintWriter writer = response.getWriter()) {
-                writer.write(message + "\n" + jsonString);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private <T> void writeResponse(HttpServletResponse response, T responseObject) {
-        try {
-            String jsonCurrencyAsString = objectMapper.writeValueAsString(responseObject);
-
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            try (PrintWriter writer = response.getWriter()) {
-                writer.write(jsonCurrencyAsString);
+                if (errorMessage != null && !errorMessage.isEmpty()) {
+                    writer.write(String.format("{\"message\":\"%s\"}", errorMessage));
+                } else if (responseObject != null) {
+                    writer.write(objectMapper.writeValueAsString(responseObject));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
