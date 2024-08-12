@@ -7,6 +7,7 @@ import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dto.Currency;
 
 public class CurrencyService extends BaseCrudService<Integer, Currency, EntityCurrency, EntityCurrencyConverter, CurrencyDao> {
+
     public CurrencyService() {
         super(new JdbcCurrencyDao(), new EntityCurrencyConverter());
     }

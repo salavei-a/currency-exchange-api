@@ -23,8 +23,8 @@ public abstract class BaseCrudService<I extends Comparable<I>,
     }
 
     @Override
-    public void save(D dto) {
-        entityDao.save(converter.toEntity(dto));
+    public D create(D dto) {
+        return converter.toDto(entityDao.save(converter.toEntity(dto)));
     }
 
     @Override
