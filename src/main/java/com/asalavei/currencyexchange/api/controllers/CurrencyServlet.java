@@ -9,19 +9,14 @@ import com.asalavei.currencyexchange.api.json.converters.JsonCurrencyConverter;
 import com.asalavei.currencyexchange.api.json.converters.JsonDtoConverter;
 import com.asalavei.currencyexchange.api.services.CrudService;
 import com.asalavei.currencyexchange.api.services.CurrencyService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collection;
 
-public class CurrencyServlet extends HttpServlet {
+public class CurrencyServlet extends BaseServlet {
     private final CrudService<Integer, Currency> service = new CurrencyService();
     private final JsonDtoConverter<Integer, JsonCurrency, Currency> converter = new JsonCurrencyConverter();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -83,23 +78,5 @@ public class CurrencyServlet extends HttpServlet {
         Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
 
         writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonCurrencies);
-    }
-
-    private <T> void writeJsonResponse(HttpServletResponse response, int statusCode, String errorMessage, T responseObject) {
-        try {
-            response.setStatus(statusCode);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            try (PrintWriter writer = response.getWriter()) {
-                if (errorMessage != null && !errorMessage.isEmpty()) {
-                    writer.write(String.format("{\"message\":\"%s\"}", errorMessage));
-                } else if (responseObject != null) {
-                    writer.write(objectMapper.writeValueAsString(responseObject));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
