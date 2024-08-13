@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
  * Converter for converting between {@link JsonExchangeRate} and {@link ExchangeRate}
  */
 public class JsonExchangeRateConverter implements JsonDtoConverter<Integer, JsonExchangeRate, ExchangeRate> {
+
+    private final JsonCurrencyConverter converter = new JsonCurrencyConverter();
+
     /**
      * Converts the {@link JsonExchangeRate jsonDto} to the {@link ExchangeRate}
      *
@@ -20,8 +23,8 @@ public class JsonExchangeRateConverter implements JsonDtoConverter<Integer, Json
     public ExchangeRate toDto(JsonExchangeRate jsonDto) {
         return ExchangeRate.builder()
                 .id(jsonDto.getId())
-                .baseCurrencyId(jsonDto.getBaseCurrencyId())
-                .targetCurrencyId(jsonDto.getTargetCurrencyId())
+                .baseCurrency(converter.toDto(jsonDto.getBaseCurrency()))
+                .targetCurrency(converter.toDto(jsonDto.getTargetCurrency()))
                 .rate(jsonDto.getRate())
                 .build();
     }
@@ -36,8 +39,8 @@ public class JsonExchangeRateConverter implements JsonDtoConverter<Integer, Json
     public JsonExchangeRate toJsonDto(ExchangeRate dto) {
         return JsonExchangeRate.builder()
                 .id(dto.getId())
-                .baseCurrencyId(dto.getBaseCurrencyId())
-                .targetCurrencyId(dto.getTargetCurrencyId())
+                .baseCurrency(converter.toJsonDto(dto.getBaseCurrency()))
+                .targetCurrency(converter.toJsonDto(dto.getTargetCurrency()))
                 .rate(dto.getRate())
                 .build();
     }

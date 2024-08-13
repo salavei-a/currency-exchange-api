@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
  * Converter for converting between {@link EntityExchangeRate} and {@link ExchangeRate}
  */
 public class EntityExchangeRateConverter implements EntityDtoConverter<Integer, EntityExchangeRate, ExchangeRate> {
+
+    private final EntityCurrencyConverter converter = new EntityCurrencyConverter();
+
     /**
      * Converts the {@link ExchangeRate dto} to the {@link EntityExchangeRate}
      *
@@ -20,8 +23,8 @@ public class EntityExchangeRateConverter implements EntityDtoConverter<Integer, 
     public EntityExchangeRate toEntity(ExchangeRate dto) {
         return EntityExchangeRate.builder()
                 .id(dto.getId())
-                .baseCurrencyId(dto.getBaseCurrencyId())
-                .targetCurrencyId(dto.getTargetCurrencyId())
+                .baseCurrency(converter.toEntity(dto.getBaseCurrency()))
+                .targetCurrency(converter.toEntity(dto.getTargetCurrency()))
                 .rate(dto.getRate())
                 .build();
     }
@@ -36,8 +39,8 @@ public class EntityExchangeRateConverter implements EntityDtoConverter<Integer, 
     public ExchangeRate toDto(EntityExchangeRate entity) {
         return ExchangeRate.builder()
                 .id(entity.getId())
-                .baseCurrencyId(entity.getBaseCurrencyId())
-                .targetCurrencyId(entity.getTargetCurrencyId())
+                .baseCurrency(converter.toDto(entity.getBaseCurrency()))
+                .targetCurrency(converter.toDto(entity.getTargetCurrency()))
                 .rate(entity.getRate())
                 .build();
     }
