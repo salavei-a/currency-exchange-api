@@ -1,5 +1,7 @@
 package com.asalavei.currencyexchange.api.controllers;
 
+import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
+import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
@@ -15,7 +17,7 @@ import java.util.Collection;
 public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
     public CurrenciesServlet() {
-        super(new CurrencyService(), new JsonCurrencyConverter());
+        super(new CurrencyService(new JdbcCurrencyDao(), new EntityCurrencyConverter()), new JsonCurrencyConverter());
     }
 
     @Override

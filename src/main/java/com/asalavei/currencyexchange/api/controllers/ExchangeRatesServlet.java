@@ -1,5 +1,8 @@
 package com.asalavei.currencyexchange.api.controllers;
 
+import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
+import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcCurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
@@ -13,7 +16,7 @@ import java.util.Collection;
 public class ExchangeRatesServlet extends BaseServlet<Integer, JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
     public ExchangeRatesServlet() {
-        super(new ExchangeRateService(), new JsonExchangeRateConverter());
+        super(new ExchangeRateService(new JdbcExchangeRateDao(new JdbcCurrencyDao()), new EntityExchangeRateConverter()), new JsonExchangeRateConverter());
     }
 
     @Override
