@@ -8,7 +8,7 @@ import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class JdbcCurrencyDao implements CurrencyDao {
     @Override
@@ -33,11 +33,11 @@ public class JdbcCurrencyDao implements CurrencyDao {
     }
 
     @Override
-    public List<EntityCurrency> findAll() {
+    public Collection<EntityCurrency> findAll() {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies");
              ResultSet resultSet = preparedStatement.executeQuery()) {
-            List<EntityCurrency> currencies = new ArrayList<>();
+            Collection<EntityCurrency> currencies = new ArrayList<>();
 
             while (resultSet.next()) {
                 EntityCurrency entityCurrency = EntityCurrency.builder()
