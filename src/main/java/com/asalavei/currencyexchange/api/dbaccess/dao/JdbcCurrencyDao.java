@@ -57,13 +57,27 @@ public class JdbcCurrencyDao implements CurrencyDao {
     }
 
     @Override
+    public EntityCurrency findById(Integer id) {
+        return findBy("SELECT * FROM currencies WHERE id = ?", id);
+    }
+
+    @Override
     public EntityCurrency findByCode(String code) {
+        return findBy("SELECT * FROM currencies WHERE code = ?", code);
+    }
+
+    public <T> EntityCurrency findBy(String query, T parameter) {
         EntityCurrency entityCurrency = null;
 
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies WHERE code = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setString(1, code);
+            if (parameter instanceof Integer) {
+                preparedStatement.setInt(1, (Integer) parameter);
+            } else if (parameter instanceof String) {
+                preparedStatement.setString(1, (String) parameter);
+            }
+
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
@@ -74,7 +88,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
                         .sign(resultSet.getString("sign"))
                         .build();
             } else {
-                throw new CENotFoundException("Not found Currency with code = '" + code + "'");
+                throw new CENotFoundException("Not found Currency with " + (parameter instanceof Integer ? "id" : "code") + " = '" + parameter + "'");
             }
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);

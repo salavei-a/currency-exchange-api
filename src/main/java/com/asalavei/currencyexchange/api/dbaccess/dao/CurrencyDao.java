@@ -11,6 +11,8 @@ public interface CurrencyDao extends BaseEntityDao<Integer, EntityCurrency> {
     @Override
     Collection<EntityCurrency> findAll();
 
+    EntityCurrency findById(Integer id);
+
     @Override
     EntityCurrency findByCode(String code);
 }
