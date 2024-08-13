@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
-    protected ExchangeRateServlet() {
+    public ExchangeRateServlet() {
         super(new ExchangeRateService(), new JsonExchangeRateConverter());
     }
 

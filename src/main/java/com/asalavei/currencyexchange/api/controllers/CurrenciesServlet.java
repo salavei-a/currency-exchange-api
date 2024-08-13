@@ -14,7 +14,7 @@ import java.util.Collection;
 
 public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
-    protected CurrenciesServlet() {
+    public CurrenciesServlet() {
         super(new CurrencyService(), new JsonCurrencyConverter());
     }
 
