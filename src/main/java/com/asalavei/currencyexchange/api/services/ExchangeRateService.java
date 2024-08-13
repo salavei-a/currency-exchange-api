@@ -10,4 +10,8 @@ public class ExchangeRateService extends BaseCrudService<Integer, ExchangeRate, 
     public ExchangeRateService(ExchangeRateDao entityDao, EntityExchangeRateConverter converter) {
         super(entityDao, converter);
     }
+
+    public ExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
+        return converter.toDto(entityDao.findByCurrencyPair(idBaseCurrency, idTargetCurrency));
+    }
 }
