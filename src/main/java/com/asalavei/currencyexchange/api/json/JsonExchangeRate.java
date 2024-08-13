@@ -6,24 +6,24 @@ import java.math.BigDecimal;
  * DTO representing exchange rate data that can be serialized to and deserialized from JSON
  */
 public class JsonExchangeRate extends BaseJsonDto<Integer> {
-    private Integer baseCurrencyId;
-    private Integer targetCurrencyId;
+    private JsonCurrency baseCurrency;
+    private JsonCurrency targetCurrency;
     private BigDecimal rate;
 
-    public Integer getBaseCurrencyId() {
-        return baseCurrencyId;
+    public JsonCurrency getBaseCurrency() {
+        return baseCurrency;
     }
 
-    public void setBaseCurrencyId(Integer baseCurrencyId) {
-        this.baseCurrencyId = baseCurrencyId;
+    public void setBaseCurrency(JsonCurrency baseCurrency) {
+        this.baseCurrency = baseCurrency;
     }
 
-    public Integer getTargetCurrencyId() {
-        return targetCurrencyId;
+    public JsonCurrency getTargetCurrency() {
+        return targetCurrency;
     }
 
-    public void setTargetCurrencyId(Integer targetCurrencyId) {
-        this.targetCurrencyId = targetCurrencyId;
+    public void setTargetCurrency(JsonCurrency targetCurrency) {
+        this.targetCurrency = targetCurrency;
     }
 
     public BigDecimal getRate() {
@@ -48,8 +48,8 @@ public class JsonExchangeRate extends BaseJsonDto<Integer> {
      */
     public static final class Builder {
         private Integer id;
-        private Integer baseCurrencyId;
-        private Integer targetCurrencyId;
+        private JsonCurrency baseCurrency;
+        private JsonCurrency targetCurrency;
         private BigDecimal rate;
 
         private Builder() {
@@ -60,13 +60,13 @@ public class JsonExchangeRate extends BaseJsonDto<Integer> {
             return this;
         }
 
-        public Builder baseCurrencyId(Integer baseCurrencyId) {
-            this.baseCurrencyId = baseCurrencyId;
+        public Builder baseCurrency(JsonCurrency baseCurrency) {
+            this.baseCurrency = baseCurrency;
             return this;
         }
 
-        public Builder targetCurrencyId(Integer targetCurrencyId) {
-            this.targetCurrencyId = targetCurrencyId;
+        public Builder targetCurrency(JsonCurrency targetCurrency) {
+            this.targetCurrency = targetCurrency;
             return this;
         }
 
@@ -79,8 +79,8 @@ public class JsonExchangeRate extends BaseJsonDto<Integer> {
             JsonExchangeRate jsonExchangeRate = new JsonExchangeRate();
 
             jsonExchangeRate.setId(id);
-            jsonExchangeRate.setBaseCurrencyId(baseCurrencyId);
-            jsonExchangeRate.setTargetCurrencyId(targetCurrencyId);
+            jsonExchangeRate.setBaseCurrency(baseCurrency);
+            jsonExchangeRate.setTargetCurrency(targetCurrency);
             jsonExchangeRate.setRate(rate);
 
             return jsonExchangeRate;

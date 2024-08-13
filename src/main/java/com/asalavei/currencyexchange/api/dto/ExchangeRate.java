@@ -7,14 +7,14 @@ import java.math.BigDecimal;
  */
 public class ExchangeRate implements BaseDto<Integer> {
     private final Integer id;
-    private final Integer baseCurrencyId;
-    private final Integer targetCurrencyId;
+    private final Currency baseCurrency;
+    private final Currency targetCurrency;
     private final BigDecimal rate;
 
-    public ExchangeRate(Integer id, Integer baseCurrencyId, Integer targetCurrencyId, BigDecimal rate) {
+    public ExchangeRate(Integer id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
         this.id = id;
-        this.baseCurrencyId = baseCurrencyId;
-        this.targetCurrencyId = targetCurrencyId;
+        this.baseCurrency = baseCurrency;
+        this.targetCurrency = targetCurrency;
         this.rate = rate;
     }
 
@@ -22,12 +22,12 @@ public class ExchangeRate implements BaseDto<Integer> {
         return id;
     }
 
-    public Integer getBaseCurrencyId() {
-        return baseCurrencyId;
+    public Currency getBaseCurrency() {
+        return baseCurrency;
     }
 
-    public Integer getTargetCurrencyId() {
-        return targetCurrencyId;
+    public Currency getTargetCurrency() {
+        return targetCurrency;
     }
 
     public BigDecimal getRate() {
@@ -48,8 +48,8 @@ public class ExchangeRate implements BaseDto<Integer> {
      */
     public static final class Builder {
         private Integer id;
-        private Integer baseCurrencyId;
-        private Integer targetCurrencyId;
+        private Currency baseCurrency;
+        private Currency targetCurrency;
         private BigDecimal rate;
 
         private Builder() {
@@ -60,13 +60,13 @@ public class ExchangeRate implements BaseDto<Integer> {
             return this;
         }
 
-        public Builder baseCurrencyId(Integer baseCurrencyId) {
-            this.baseCurrencyId = baseCurrencyId;
+        public Builder baseCurrency(Currency baseCurrency) {
+            this.baseCurrency = baseCurrency;
             return this;
         }
 
-        public Builder targetCurrencyId(Integer targetCurrencyId) {
-            this.targetCurrencyId = targetCurrencyId;
+        public Builder targetCurrency(Currency targetCurrency) {
+            this.targetCurrency = targetCurrency;
             return this;
         }
 
@@ -76,7 +76,7 @@ public class ExchangeRate implements BaseDto<Integer> {
         }
 
         public ExchangeRate build() {
-            return new ExchangeRate(id, baseCurrencyId, targetCurrencyId, rate);
+            return new ExchangeRate(id, baseCurrency, targetCurrency, rate);
         }
     }
 }

@@ -6,24 +6,24 @@ import java.math.BigDecimal;
  * Entity representing exchange rate data stored in the database
  */
 public class EntityExchangeRate extends BaseEntity<Integer> {
-    private Integer baseCurrencyId;
-    private Integer targetCurrencyId;
+    private EntityCurrency baseCurrency;
+    private EntityCurrency targetCurrency;
     private BigDecimal rate;
 
-    public Integer getBaseCurrencyId() {
-        return baseCurrencyId;
+    public EntityCurrency getBaseCurrency() {
+        return baseCurrency;
     }
 
-    public void setBaseCurrencyId(Integer baseCurrencyId) {
-        this.baseCurrencyId = baseCurrencyId;
+    public void setBaseCurrency(EntityCurrency baseCurrency) {
+        this.baseCurrency = baseCurrency;
     }
 
-    public Integer getTargetCurrencyId() {
-        return targetCurrencyId;
+    public EntityCurrency getTargetCurrency() {
+        return targetCurrency;
     }
 
-    public void setTargetCurrencyId(Integer targetCurrencyId) {
-        this.targetCurrencyId = targetCurrencyId;
+    public void setTargetCurrency(EntityCurrency targetCurrency) {
+        this.targetCurrency = targetCurrency;
     }
 
     public BigDecimal getRate() {
@@ -48,8 +48,8 @@ public class EntityExchangeRate extends BaseEntity<Integer> {
      */
     public static final class Builder {
         private Integer id;
-        private Integer baseCurrencyId;
-        private Integer targetCurrencyId;
+        private EntityCurrency baseCurrency;
+        private EntityCurrency targetCurrency;
         private BigDecimal rate;
 
         public Builder id(Integer id) {
@@ -57,13 +57,13 @@ public class EntityExchangeRate extends BaseEntity<Integer> {
             return this;
         }
 
-        public Builder baseCurrencyId(Integer baseCurrencyId) {
-            this.baseCurrencyId = baseCurrencyId;
+        public Builder baseCurrency(EntityCurrency baseCurrency) {
+            this.baseCurrency = baseCurrency;
             return this;
         }
 
-        public Builder targetCurrencyId(Integer targetCurrencyId) {
-            this.targetCurrencyId = targetCurrencyId;
+        public Builder targetCurrency(EntityCurrency targetCurrency) {
+            this.targetCurrency = targetCurrency;
             return this;
         }
 
@@ -76,8 +76,8 @@ public class EntityExchangeRate extends BaseEntity<Integer> {
             EntityExchangeRate entityExchangeRate = new EntityExchangeRate();
 
             entityExchangeRate.setId(id);
-            entityExchangeRate.setBaseCurrencyId(baseCurrencyId);
-            entityExchangeRate.setTargetCurrencyId(targetCurrencyId);
+            entityExchangeRate.setBaseCurrency(baseCurrency);
+            entityExchangeRate.setTargetCurrency(targetCurrency);
             entityExchangeRate.setRate(rate);
 
             return entityExchangeRate;
