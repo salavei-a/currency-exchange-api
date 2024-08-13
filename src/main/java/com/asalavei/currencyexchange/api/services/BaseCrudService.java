@@ -14,8 +14,8 @@ public abstract class BaseCrudService<I extends Comparable<I>,
         C extends EntityDtoConverter<I, E, D>,
         R extends BaseEntityDao<I, E>> implements CrudService<I, D> {
 
-    private final R entityDao;
-    private final C converter;
+    protected final R entityDao;
+    protected final C converter;
 
     protected BaseCrudService(R entityDao, C converter) {
         this.entityDao = entityDao;
