@@ -12,6 +12,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class JdbcExchangeRateDao implements ExchangeRateDao {
+
+    private final CurrencyDao currencyDao;
+
+    public JdbcExchangeRateDao(CurrencyDao currencyDao) {
+        this.currencyDao = currencyDao;
+    }
+
     @Override
     public EntityExchangeRate save(EntityExchangeRate entity) {
         return null; //TODO
@@ -27,8 +34,8 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
             while (resultSet.next()) {
                 EntityExchangeRate entityExchangeRate = EntityExchangeRate.builder()
                         .id(resultSet.getInt("id"))
-                        .baseCurrencyId(resultSet.getInt("base_currency_id"))
-                        .targetCurrencyId(resultSet.getInt("target_currency_id"))
+                        .baseCurrency(currencyDao.findById(resultSet.getInt("base_currency_id")))
+                        .targetCurrency(currencyDao.findById(resultSet.getInt("target_currency_id")))
                         .rate(resultSet.getBigDecimal("rate"))
                         .build();
 
