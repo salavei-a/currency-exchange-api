@@ -27,4 +27,12 @@
         <servlet-name>ExchangeRateServlet</servlet-name>
         <url-pattern>/exchangeRate/*</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>ExchangeRatesServlet</servlet-name>
+        <servlet-class>com.asalavei.currencyexchange.api.controllers.ExchangeRatesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ExchangeRatesServlet</servlet-name>
+        <url-pattern>/exchangeRates</url-pattern>
+    </servlet-mapping>
 </web-app>
