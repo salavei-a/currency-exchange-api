@@ -4,7 +4,7 @@ import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Converter for converting between {@link JsonExchangeRate} and {@link ExchangeRate}
@@ -44,6 +44,6 @@ public class JsonExchangeRateConverter implements JsonDtoConverter<Integer, Json
 
     @Override
     public Collection<JsonExchangeRate> toJsonDto(Collection<ExchangeRate> dtoCollection) {
-        return List.of();
+        return dtoCollection.stream().map(this::toJsonDto).collect(Collectors.toList());
     }
 }
