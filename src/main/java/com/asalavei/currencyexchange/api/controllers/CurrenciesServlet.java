@@ -3,7 +3,6 @@ package com.asalavei.currencyexchange.api.controllers;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
-import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.converters.JsonCurrencyConverter;
 import com.asalavei.currencyexchange.api.services.CurrencyService;
@@ -15,14 +14,8 @@ import java.util.Collection;
 
 public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
-    @Override
-    protected CurrencyService createService() {
-        return new CurrencyService();
-    }
-
-    @Override
-    protected JsonCurrencyConverter createConverter() {
-        return new JsonCurrencyConverter();
+    protected CurrenciesServlet() {
+        super(new CurrencyService(), new JsonCurrencyConverter());
     }
 
     @Override
@@ -32,8 +25,6 @@ public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Curren
             Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
 
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonCurrencies);
-        } catch (CENotFoundException e) {
-            writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
         } catch (CEDatabaseUnavailableException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }

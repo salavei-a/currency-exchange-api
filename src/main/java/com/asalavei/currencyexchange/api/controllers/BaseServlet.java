@@ -22,14 +22,10 @@ public abstract class BaseServlet<I extends Comparable<I>,
 
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
-    protected BaseServlet() {
-        this.service = createService();
-        this.converter = createConverter();
+    protected BaseServlet(S service, C converter) {
+        this.service = service;
+        this.converter = converter;
     }
-
-    protected abstract S createService();
-
-    protected abstract C createConverter();
 
     protected <T> void writeJsonResponse(HttpServletResponse response, int statusCode, String errorMessage, T responseObject) {
         try {

@@ -11,14 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class CurrencyServlet extends BaseServlet<Integer, JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
-    @Override
-    protected CurrencyService createService() {
-        return new CurrencyService();
-    }
-
-    @Override
-    protected JsonCurrencyConverter createConverter() {
-        return new JsonCurrencyConverter();
+    protected CurrencyServlet() {
+        super(new CurrencyService(), new JsonCurrencyConverter());
     }
 
     @Override
