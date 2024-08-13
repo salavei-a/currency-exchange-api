@@ -3,6 +3,7 @@ package com.asalavei.currencyexchange.api.dbaccess.dao;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
+import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,6 +47,32 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
         }
+    }
+
+    @Override
+    public EntityExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
+        String query = "SELECT * FROM exchange_rates WHERE base_currency_id = " + idBaseCurrency + " AND target_currency_id = " + idTargetCurrency;
+        EntityExchangeRate entityExchangeRate = null;
+
+        try (Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            if (resultSet.next()) {
+                entityExchangeRate = EntityExchangeRate.builder()
+                        .id(resultSet.getInt("id"))
+                        .baseCurrency(currencyDao.findById(resultSet.getInt("base_currency_id")))
+                        .targetCurrency(currencyDao.findById(resultSet.getInt("target_currency_id")))
+                        .rate(resultSet.getBigDecimal("rate"))
+                        .build();
+            } else {
+                throw new CENotFoundException("Not found exchange rate for this currency pair.");
+            }
+        } catch (SQLException e) {
+            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+        }
+
+        return entityExchangeRate;
     }
 
     @Override
