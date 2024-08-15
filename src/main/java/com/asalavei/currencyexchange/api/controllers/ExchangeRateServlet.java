@@ -12,8 +12,11 @@ import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
 import com.asalavei.currencyexchange.api.services.CurrencyService;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 
 public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
@@ -50,6 +53,14 @@ public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, 
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if ("PATCH".equalsIgnoreCase(request.getMethod())) {
+            this.doPatch(request, response);
+        } else {
+            super.service(request, response);
+        }
+    }
+
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) {
     }
 }
