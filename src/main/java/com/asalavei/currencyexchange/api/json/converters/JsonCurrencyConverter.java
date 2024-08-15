@@ -20,8 +20,8 @@ public class JsonCurrencyConverter implements JsonDtoConverter<Integer, JsonCurr
     public Currency toDto(JsonCurrency jsonDto) {
         return Currency.builder()
                 .id(jsonDto.getId())
+                .name(jsonDto.getName())
                 .code(jsonDto.getCode())
-                .fullName(jsonDto.getFullName())
                 .sign(jsonDto.getSign())
                 .build();
     }
@@ -36,8 +36,8 @@ public class JsonCurrencyConverter implements JsonDtoConverter<Integer, JsonCurr
     public JsonCurrency toJsonDto(Currency dto) {
         return JsonCurrency.builder()
                 .id(dto.getId())
+                .name(dto.getName())
                 .code(dto.getCode())
-                .fullName(dto.getFullName())
                 .sign(dto.getSign())
                 .build();
     }

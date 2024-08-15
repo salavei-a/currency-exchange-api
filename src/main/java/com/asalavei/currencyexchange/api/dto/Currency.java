@@ -5,14 +5,14 @@ package com.asalavei.currencyexchange.api.dto;
  */
 public class Currency implements BaseDto<Integer> {
     private final Integer id;
+    private final String name;
     private final String code;
-    private final String fullName;
     private final String sign;
 
-    public Currency(Integer id, String code, String fullName, String sign) {
+    public Currency(Integer id, String name, String code, String sign) {
         this.id = id;
+        this.name = name;
         this.code = code;
-        this.fullName = fullName;
         this.sign = sign;
     }
 
@@ -21,12 +21,12 @@ public class Currency implements BaseDto<Integer> {
         return id;
     }
 
-    public String getCode() {
-        return code;
+    public String getName() {
+        return name;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getCode() {
+        return code;
     }
 
     public String getSign() {
@@ -47,8 +47,8 @@ public class Currency implements BaseDto<Integer> {
      */
     public static final class Builder {
         private Integer id;
+        private String name;
         private String code;
-        private String fullName;
         private String sign;
 
         private Builder() {
@@ -59,13 +59,13 @@ public class Currency implements BaseDto<Integer> {
             return this;
         }
 
-        public Builder code(String code) {
-            this.code = code;
+        public Builder name(String name) {
+            this.name = name;
             return this;
         }
 
-        public Builder fullName(String fullName) {
-            this.fullName = fullName;
+        public Builder code(String code) {
+            this.code = code;
             return this;
         }
 
@@ -75,7 +75,7 @@ public class Currency implements BaseDto<Integer> {
         }
 
         public Currency build() {
-            return new Currency(id, code, fullName, sign);
+            return new Currency(id, name, code, sign);
         }
     }
 }

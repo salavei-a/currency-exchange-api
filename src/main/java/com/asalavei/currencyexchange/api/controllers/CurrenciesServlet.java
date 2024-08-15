@@ -34,19 +34,19 @@ public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Curren
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         String code = request.getParameter("code");
-        String fullName = request.getParameter("full_name");
+        String name = request.getParameter("full_name");
         String sign = request.getParameter("sign");
 
         if (code == null || code.isEmpty() ||
-            fullName == null || fullName.isEmpty() ||
+            name == null || name.isEmpty() ||
             sign == null || sign.isEmpty()) {
             writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Required form field is missing.", null);
             return;
         }
 
         Currency dtoCurrency = Currency.builder()
+                .name(name)
                 .code(code)
-                .fullName(fullName)
                 .sign(sign)
                 .build();
 

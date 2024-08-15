@@ -15,10 +15,10 @@ public class JdbcCurrencyDao implements CurrencyDao {
     public EntityCurrency save(EntityCurrency entity) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO currencies (code, full_name, sign) VALUES (?, ?, ?) RETURNING id"
+                     "INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING id"
              )) {
-            preparedStatement.setString(1, entity.getCode());
-            preparedStatement.setString(2, entity.getFullName());
+            preparedStatement.setString(1, entity.getName());
+            preparedStatement.setString(2, entity.getCode());
             preparedStatement.setString(3, entity.getSign());
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -28,8 +28,8 @@ public class JdbcCurrencyDao implements CurrencyDao {
 
                 return EntityCurrency.builder()
                         .id(id)
+                        .name(entity.getName())
                         .code(entity.getCode())
-                        .fullName(entity.getFullName())
                         .sign(entity.getSign())
                         .build();
             } else {
@@ -53,8 +53,8 @@ public class JdbcCurrencyDao implements CurrencyDao {
             while (resultSet.next()) {
                 EntityCurrency entityCurrency = EntityCurrency.builder()
                         .id(resultSet.getInt("id"))
+                        .name(resultSet.getString("full_name"))
                         .code(resultSet.getString("code"))
-                        .fullName(resultSet.getString("full_name"))
                         .sign(resultSet.getString("sign"))
                         .build();
 
@@ -94,8 +94,8 @@ public class JdbcCurrencyDao implements CurrencyDao {
             if (resultSet.next()) {
                 entityCurrency = EntityCurrency.builder()
                         .id(resultSet.getInt("id"))
+                        .name(resultSet.getString("full_name"))
                         .code(resultSet.getString("code"))
-                        .fullName(resultSet.getString("full_name"))
                         .sign(resultSet.getString("sign"))
                         .build();
             } else {

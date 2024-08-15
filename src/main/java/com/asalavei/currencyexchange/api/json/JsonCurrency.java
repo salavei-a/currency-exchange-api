@@ -4,9 +4,17 @@ package com.asalavei.currencyexchange.api.json;
  * DTO representing currency data that can be serialized to and deserialized from JSON
  */
 public class JsonCurrency extends BaseJsonDto<Integer> {
+    private String name;
     private String code;
-    private String fullName;
     private String sign;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getCode() {
         return code;
@@ -14,14 +22,6 @@ public class JsonCurrency extends BaseJsonDto<Integer> {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 
     public String getSign() {
@@ -46,8 +46,8 @@ public class JsonCurrency extends BaseJsonDto<Integer> {
      */
     public static final class Builder {
         private Integer id;
+        private String name;
         private String code;
-        private String fullName;
         private String sign;
 
         private Builder() {
@@ -58,13 +58,13 @@ public class JsonCurrency extends BaseJsonDto<Integer> {
             return this;
         }
 
-        public Builder code(String code) {
-            this.code = code;
+        public Builder name(String name) {
+            this.name = name;
             return this;
         }
 
-        public Builder fullName(String fullName) {
-            this.fullName = fullName;
+        public Builder code(String code) {
+            this.code = code;
             return this;
         }
 
@@ -77,8 +77,8 @@ public class JsonCurrency extends BaseJsonDto<Integer> {
             JsonCurrency jsonCurrency = new JsonCurrency();
 
             jsonCurrency.setId(id);
+            jsonCurrency.setName(name);
             jsonCurrency.setCode(code);
-            jsonCurrency.setFullName(fullName);
             jsonCurrency.setSign(sign);
 
             return jsonCurrency;

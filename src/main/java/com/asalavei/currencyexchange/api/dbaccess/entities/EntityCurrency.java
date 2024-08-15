@@ -4,9 +4,17 @@ package com.asalavei.currencyexchange.api.dbaccess.entities;
  * Entity representing currency data stored in the database
  */
 public class EntityCurrency extends BaseEntity<Integer> {
+    private String name;
     private String code;
-    private String fullName;
     private String sign;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getCode() {
         return code;
@@ -14,14 +22,6 @@ public class EntityCurrency extends BaseEntity<Integer> {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 
     public String getSign() {
@@ -46,8 +46,8 @@ public class EntityCurrency extends BaseEntity<Integer> {
      */
     public static final class Builder {
         private Integer id;
+        private String name;
         private String code;
-        private String fullName;
         private String sign;
 
         private Builder() {
@@ -58,13 +58,13 @@ public class EntityCurrency extends BaseEntity<Integer> {
             return this;
         }
 
-        public Builder code(String code) {
-            this.code = code;
+        public Builder name(String name) {
+            this.name = name;
             return this;
         }
 
-        public Builder fullName(String fullName) {
-            this.fullName = fullName;
+        public Builder code(String code) {
+            this.code = code;
             return this;
         }
 
@@ -77,8 +77,8 @@ public class EntityCurrency extends BaseEntity<Integer> {
             EntityCurrency entityCurrency = new EntityCurrency();
 
             entityCurrency.setId(id);
+            entityCurrency.setName(name);
             entityCurrency.setCode(code);
-            entityCurrency.setFullName(fullName);
             entityCurrency.setSign(sign);
 
             return entityCurrency;

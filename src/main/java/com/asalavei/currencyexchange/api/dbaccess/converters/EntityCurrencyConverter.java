@@ -20,8 +20,8 @@ public class EntityCurrencyConverter implements EntityDtoConverter<Integer, Enti
     public EntityCurrency toEntity(Currency dto) {
         return EntityCurrency.builder()
                 .id(dto.getId())
+                .name(dto.getName())
                 .code(dto.getCode())
-                .fullName(dto.getFullName())
                 .sign(dto.getSign())
                 .build();
     }
@@ -36,8 +36,8 @@ public class EntityCurrencyConverter implements EntityDtoConverter<Integer, Enti
     public Currency toDto(EntityCurrency entity) {
         return Currency.builder()
                 .id(entity.getId())
+                .name(entity.getName())
                 .code(entity.getCode())
-                .fullName(entity.getFullName())
                 .sign(entity.getSign())
                 .build();
     }
