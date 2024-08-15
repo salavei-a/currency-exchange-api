@@ -8,6 +8,4 @@ public interface BaseEntityDao<I extends Comparable<I>, E extends BaseEntity<I>>
     E save(E entity);
 
     Collection<E> findAll();
-
-    E findByCode(String code);
 }

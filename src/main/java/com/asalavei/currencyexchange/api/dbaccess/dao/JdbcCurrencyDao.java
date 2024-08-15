@@ -17,7 +17,6 @@ public class JdbcCurrencyDao implements CurrencyDao {
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "INSERT INTO currencies (code, full_name, sign) VALUES (?, ?, ?)"
              )) {
-
             preparedStatement.setString(1, entity.getCode());
             preparedStatement.setString(2, entity.getFullName());
             preparedStatement.setString(3, entity.getSign());
