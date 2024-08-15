@@ -35,10 +35,10 @@ public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, 
         }
 
         try {
-            Currency dtobaseCurrency = currencyService.findByCode(pathInfo.substring(1, 4));
-            Currency dtotargetCurrency = currencyService.findByCode(pathInfo.substring(4, 7));
+            Currency dtoBaseCurrency = currencyService.findByCode(pathInfo.substring(1, 4));
+            Currency dtoTargetCurrency = currencyService.findByCode(pathInfo.substring(4, 7));
 
-            ExchangeRate dtoExchangeRate = service.findByCurrencyPair(dtobaseCurrency.getId(), dtotargetCurrency.getId());
+            ExchangeRate dtoExchangeRate = service.findByCurrencyPair(dtoBaseCurrency.getId(), dtoTargetCurrency.getId());
             JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
 
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);
