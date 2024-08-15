@@ -107,4 +107,22 @@ public class JdbcCurrencyDao implements CurrencyDao {
 
         return entityCurrency;
     }
+
+    @Override
+    public int getIdByCode(String code) {
+        try (Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM currencies WHERE code = ?")) {
+            preparedStatement.setString(1, code);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            } else {
+                throw new CENotFoundException("Not found Currency with code = '" + code + "'");
+            }
+        } catch (SQLException e) {
+            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+        }
+    }
 }
