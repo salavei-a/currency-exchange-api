@@ -11,7 +11,6 @@ import com.asalavei.currencyexchange.api.services.CurrencyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
 import java.util.Collection;
 
 public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
@@ -33,19 +32,23 @@ public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Curren
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JsonCurrency jsonCurrency = JsonCurrency.builder()
-                .code(request.getParameter("code"))
-                .fullName(request.getParameter("full_name"))
-                .sign(request.getParameter("sign"))
-                .build();
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        String code = request.getParameter("code");
+        String fullName = request.getParameter("full_name");
+        String sign = request.getParameter("sign");
 
-        if (jsonCurrency.getCode() == null || jsonCurrency.getFullName() == null || jsonCurrency.getSign() == null) {
+        if (code == null || code.isEmpty() ||
+            fullName == null || fullName.isEmpty() ||
+            sign == null || sign.isEmpty()) {
             writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Required form field is missing.", null);
             return;
         }
 
-        Currency dtoCurrency = converter.toDto(jsonCurrency);
+        Currency dtoCurrency = Currency.builder()
+                .code(code)
+                .fullName(fullName)
+                .sign(sign)
+                .build();
 
         try {
             JsonCurrency savedJsonCurrency = converter.toJsonDto(service.create(dtoCurrency));
