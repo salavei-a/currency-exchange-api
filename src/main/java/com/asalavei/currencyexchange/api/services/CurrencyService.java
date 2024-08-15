@@ -10,4 +10,8 @@ public class CurrencyService extends BaseCrudService<Integer, Currency, EntityCu
     public CurrencyService(CurrencyDao entityDao, EntityCurrencyConverter converter) {
         super(entityDao, converter);
     }
+
+    public Currency findByCode(String code) {
+        return converter.toDto(entityDao.findByCode(code));
+    }
 }

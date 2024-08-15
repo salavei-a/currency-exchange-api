@@ -8,6 +8,4 @@ public interface CrudService<I extends Comparable<I>, D extends BaseDto<I>> {
     D create(D dto);
 
     Collection<D> findAll();
-
-    D findByCode(String code);
 }
