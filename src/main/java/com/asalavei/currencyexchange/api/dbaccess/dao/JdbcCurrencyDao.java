@@ -15,14 +15,26 @@ public class JdbcCurrencyDao implements CurrencyDao {
     public EntityCurrency save(EntityCurrency entity) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO currencies (code, full_name, sign) VALUES (?, ?, ?)"
+                     "INSERT INTO currencies (code, full_name, sign) VALUES (?, ?, ?) RETURNING id"
              )) {
             preparedStatement.setString(1, entity.getCode());
             preparedStatement.setString(2, entity.getFullName());
             preparedStatement.setString(3, entity.getSign());
-            preparedStatement.executeUpdate();
 
-            return findByCode(entity.getCode());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int id = resultSet.getInt(1);
+
+                return EntityCurrency.builder()
+                        .id(id)
+                        .code(entity.getCode())
+                        .fullName(entity.getFullName())
+                        .sign(entity.getSign())
+                        .build();
+            } else {
+                throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
+            }
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
                 throw new CEAlreadyExists("Currency with '" + entity.getCode() + "' code already exists.");
