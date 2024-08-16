@@ -85,15 +85,18 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
 
     @Override
     public EntityExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
-        String query = "SELECT * FROM exchange_rates WHERE base_currency_id = " + idBaseCurrency + " AND target_currency_id = " + idTargetCurrency;
-        EntityExchangeRate entityExchangeRate = null;
+        String query = "SELECT * FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)";
 
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+             ) {
+            preparedStatement.setInt(1, idBaseCurrency);
+            preparedStatement.setInt(2, idTargetCurrency);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                entityExchangeRate = EntityExchangeRate.builder()
+                return EntityExchangeRate.builder()
                         .id(resultSet.getInt("id"))
                         .baseCurrency(currencyDao.findById(resultSet.getInt("base_currency_id")))
                         .targetCurrency(currencyDao.findById(resultSet.getInt("target_currency_id")))
@@ -105,7 +108,33 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
         }
+    }
 
-        return entityExchangeRate;
+    @Override
+    public EntityExchangeRate update(BigDecimal rate, int idBaseCurrency, int idTargetCurrency) {
+        try (Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "UPDATE exchange_rates SET rate = ? WHERE (base_currency_id, target_currency_id) = (?, ?) RETURNING id")) {
+            preparedStatement.setBigDecimal(1, rate);
+            preparedStatement.setInt(2, idBaseCurrency);
+            preparedStatement.setInt(3, idTargetCurrency);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int idExchangeRate = resultSet.getInt(1);
+
+                return EntityExchangeRate.builder()
+                        .id(idExchangeRate)
+                        .baseCurrency(currencyDao.findById(idBaseCurrency))
+                        .targetCurrency(currencyDao.findById(idTargetCurrency))
+                        .rate(rate)
+                        .build();
+            } else {
+                throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
+            }
+        } catch (SQLException e) {
+            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+        }
     }
 }
