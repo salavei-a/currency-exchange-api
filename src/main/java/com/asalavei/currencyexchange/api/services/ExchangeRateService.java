@@ -17,6 +17,10 @@ public class ExchangeRateService extends BaseCrudService<Integer, ExchangeRate, 
         return converter.toDto(entityDao.findByCurrencyPair(idBaseCurrency, idTargetCurrency));
     }
 
+    public BigDecimal getRateByCurrencyPair(int idBaseCurrency, int idTargetCurrency) {
+        return entityDao.getRateByCurrencyPair(idBaseCurrency, idTargetCurrency);
+    }
+
     public ExchangeRate update(BigDecimal rate, int idBaseCurrency, int idTargetCurrency) {
         return converter.toDto(entityDao.update(rate, idBaseCurrency, idTargetCurrency));
     }
