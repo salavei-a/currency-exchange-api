@@ -11,12 +11,13 @@ import java.math.RoundingMode;
 public class ExchangeService {
     private final CurrencyService currencyService;
     private final ExchangeRateService exchangeRateService;
-    private final Integer crossCurrencyId;
+    private final String crossCurrencyCode;
+    private Integer crossCurrencyId;
 
     public ExchangeService(CurrencyService currencyService, ExchangeRateService exchangeRateService, String crossCurrencyCode) {
         this.currencyService = currencyService;
         this.exchangeRateService = exchangeRateService;
-        this.crossCurrencyId = currencyService.getIdByCode(crossCurrencyCode);
+        this.crossCurrencyCode = crossCurrencyCode;
     }
 
     public BigDecimal exchange(BigDecimal amount, BigDecimal rate) {
@@ -27,24 +28,7 @@ public class ExchangeService {
         Currency baseCurrency = currencyService.findByCode(baseCurrencyCode);
         Currency targetCurrency = currencyService.findByCode(targetCurrencyCode);
 
-        BigDecimal rate;
-
-        try {
-            rate = exchangeRateService.getRateByCurrencyPair(baseCurrency.getId(), targetCurrency.getId());
-        } catch (CENotFoundException e) {
-            try {
-                BigDecimal reverseRate = exchangeRateService.getRateByCurrencyPair(targetCurrency.getId(), baseCurrency.getId());
-                rate = BigDecimal.ONE.divide(reverseRate, 6, RoundingMode.HALF_UP);
-            } catch (CENotFoundException ex) {
-                try {
-                    BigDecimal rateUsdToBaseCurrency = exchangeRateService.getRateByCurrencyPair(crossCurrencyId, baseCurrency.getId());
-                    BigDecimal rateUsdToTargetCurrency = exchangeRateService.getRateByCurrencyPair(crossCurrencyId, targetCurrency.getId());
-                    rate = rateUsdToTargetCurrency.divide(rateUsdToBaseCurrency, 6, RoundingMode.HALF_UP);
-                } catch (CENotFoundException exception) {
-                    throw new CENotFoundException("Not found exchange rate for this currency pair.");
-                }
-            }
-        }
+        BigDecimal rate = getExchangeRate(baseCurrency, targetCurrency);
 
         return Exchange.builder()
                 .baseCurrency(baseCurrency)
@@ -53,5 +37,40 @@ public class ExchangeService {
                 .amount(amount)
                 .convertedAmount(exchange(amount, rate))
                 .build();
+    }
+
+    private BigDecimal getExchangeRate(Currency baseCurrency, Currency targetCurrency) {
+        try {
+            return exchangeRateService.getRateByCurrencyPair(baseCurrency.getId(), targetCurrency.getId());
+        } catch (CENotFoundException e) {
+            return getRateFromReverseOrCrossCurrency(baseCurrency, targetCurrency);
+        }
+
+    }
+
+    private BigDecimal getRateFromReverseOrCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
+        try {
+            BigDecimal reverseRate = exchangeRateService.getRateByCurrencyPair(targetCurrency.getId(), baseCurrency.getId());
+            return BigDecimal.ONE.divide(reverseRate, 6, RoundingMode.HALF_UP);
+        } catch (CENotFoundException e) {
+            return getRateViaCrossCurrency(baseCurrency, targetCurrency);
+        }
+    }
+
+    private BigDecimal getRateViaCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
+        ensureCrossCurrencyId();
+        try {
+            BigDecimal crossToBaseCurrencyRate = exchangeRateService.getRateByCurrencyPair(crossCurrencyId, baseCurrency.getId());
+            BigDecimal crossToTargetCurrencyRate = exchangeRateService.getRateByCurrencyPair(crossCurrencyId, targetCurrency.getId());
+            return crossToTargetCurrencyRate.divide(crossToBaseCurrencyRate, 6, RoundingMode.HALF_UP);
+        } catch (CENotFoundException exception) {
+            throw new CENotFoundException("Not found exchange rate for this currency pair.");
+        }
+    }
+
+    private void ensureCrossCurrencyId() {
+        if (this.crossCurrencyId == null) {
+            this.crossCurrencyId = currencyService.getIdByCode(crossCurrencyCode);
+        }
     }
 }
