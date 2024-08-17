@@ -99,7 +99,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
                         .sign(resultSet.getString("sign"))
                         .build();
             } else {
-                throw new CENotFoundException("Not found Currency with " + (parameter instanceof Integer ? "id" : "code") + " = '" + parameter + "'");
+                throw new CENotFoundException("Not found Currency with " + (parameter instanceof Integer ? "id" : "code") + " = " + parameter);
             }
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
@@ -119,7 +119,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
             if (resultSet.next()) {
                 return resultSet.getInt("id");
             } else {
-                throw new CENotFoundException("Not found Currency with code = '" + code + "'");
+                throw new CENotFoundException("Not found Currency with code = " + code);
             }
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
