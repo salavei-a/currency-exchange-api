@@ -44,10 +44,11 @@ public class ExchangeRatesServlet extends BaseServlet<Integer, JsonExchangeRate,
         String targetCurrencyCode = request.getParameter("targetCurrencyCode");
         String rateParam = request.getParameter("rate");
 
-        if (baseCurrencyCode == null || baseCurrencyCode.isEmpty() ||
-            targetCurrencyCode == null || targetCurrencyCode.isEmpty() ||
+        if (baseCurrencyCode == null || baseCurrencyCode.length() != 3 ||
+            targetCurrencyCode == null || targetCurrencyCode.length() != 3 ||
             rateParam == null || rateParam.isEmpty()) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Required form field is missing.", null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Required form field is missing. "
+                    + "The code for each currency in the pair must contain 3 characters.", null);
             return;
         }
 

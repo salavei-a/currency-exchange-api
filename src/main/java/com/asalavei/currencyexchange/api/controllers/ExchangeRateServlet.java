@@ -41,11 +41,10 @@ public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
 
-        if (pathInfo == null || "/".equals(pathInfo) || pathInfo.length() != 7) {
-            writeJsonResponse(response,
-                    HttpServletResponse.SC_BAD_REQUEST,
-                    "Currency pair codes are missing in the URL request. The code for each currency in the pair must contain 3 characters.",
-                    null);
+        if (pathInfo == null || pathInfo.length() != 7) {
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Currency pair codes are missing in the URL request. "
+                    + "The code for each currency in the pair must contain 3 characters.", null);
+            return;
         }
 
         try {
@@ -68,7 +67,7 @@ public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, 
         Map<String, String> params = getFormParameters(request);
         String rateParam = params.get("rate");
 
-        if (pathInfo == null || "/".equals(pathInfo) || pathInfo.length() != 7) {
+        if (pathInfo == null || pathInfo.length() != 7) {
             writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                     "Currency pair codes are missing in the URL request. The code for each currency in the pair must contain 3 characters.",
                     null);

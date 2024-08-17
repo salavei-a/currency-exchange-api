@@ -37,10 +37,12 @@ public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Curren
         String name = request.getParameter("full_name");
         String sign = request.getParameter("sign");
 
-        if (code == null || code.isEmpty() ||
+        if (code == null || code.length() != 3 ||
             name == null || name.isEmpty() ||
             sign == null || sign.isEmpty()) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Required form field is missing.", null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
+                    "Required form field is missing. The currency code must contain 3 characters.",
+                    null);
             return;
         }
 

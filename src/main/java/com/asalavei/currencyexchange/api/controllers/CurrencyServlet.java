@@ -21,8 +21,9 @@ public class CurrencyServlet extends BaseServlet<Integer, JsonCurrency, Currency
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
 
-        if (pathInfo == null || "/".equals(pathInfo)) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Currency code is missing in the URL request.", null);
+        if (pathInfo == null || pathInfo.length() != 4) {
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Currency code is missing in the URL request. "
+                    + "The currency code must contain 3 characters.", null);
             return;
         }
 
