@@ -88,8 +88,7 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
         String query = "SELECT * FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)";
 
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, idBaseCurrency);
             preparedStatement.setInt(2, idTargetCurrency);
 
@@ -102,6 +101,26 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
                         .targetCurrency(currencyDao.findById(resultSet.getInt("target_currency_id")))
                         .rate(resultSet.getBigDecimal("rate"))
                         .build();
+            } else {
+                throw new CENotFoundException("Not found exchange rate for this currency pair.");
+            }
+        } catch (SQLException e) {
+            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+        }
+    }
+
+    @Override
+    public BigDecimal getRateByCurrencyPair(int idBaseCurrency, int idTargetCurrency) {
+        try (Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(
+                     "SELECT rate FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)")) {
+            preparedStatement.setInt(1, idBaseCurrency);
+            preparedStatement.setInt(2, idTargetCurrency);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getBigDecimal("rate");
             } else {
                 throw new CENotFoundException("Not found exchange rate for this currency pair.");
             }
