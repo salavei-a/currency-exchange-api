@@ -5,21 +5,16 @@ import java.math.BigDecimal;
 /**
  * Immutable DTO for transferring exchange rate data between business logic layers
  */
-public class ExchangeRate implements BaseDto<Integer> {
-    private final Integer id;
+public class ExchangeRate extends BaseDto<Integer> {
     private final Currency baseCurrency;
     private final Currency targetCurrency;
     private final BigDecimal rate;
 
     public ExchangeRate(Integer id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
-        this.id = id;
+        super(id);
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.rate = rate;
-    }
-
-    public Integer getId() {
-        return id;
     }
 
     public Currency getBaseCurrency() {

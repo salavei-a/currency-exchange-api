@@ -2,8 +2,8 @@ package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcCurrencyDao;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcExchangeRateDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
@@ -18,20 +18,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Collection;
 
-public class ExchangeRatesServlet extends BaseServlet<Integer, JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
+public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
     public ExchangeRatesServlet() {
-        super(new ExchangeRateService(new JdbcExchangeRateDao(new JdbcCurrencyDao()), new EntityExchangeRateConverter()), new JsonExchangeRateConverter());
+        super(new JsonExchangeRateConverter(), new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao(new JdbcCurrencyDao())));
     }
 
-    private final CurrencyService currencyService = new CurrencyService(new JdbcCurrencyDao(), new EntityCurrencyConverter());
+    private final CurrencyService currencyService = new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Collection<ExchangeRate> dtoExchangeRates = service.findAll();
-            Collection<JsonExchangeRate> jsonExchangeRates = converter.toJsonDto(dtoExchangeRates);
-
+            Collection<JsonExchangeRate> jsonExchangeRates = converter.toJsonDto(service.findAll());
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRates);
         } catch (CEDatabaseUnavailableException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);

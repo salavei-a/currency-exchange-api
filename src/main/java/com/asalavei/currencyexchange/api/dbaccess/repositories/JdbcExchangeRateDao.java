@@ -1,4 +1,4 @@
-package com.asalavei.currencyexchange.api.dbaccess.dao;
+package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
@@ -12,12 +12,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class JdbcExchangeRateDao implements ExchangeRateDao {
+public class JdbcExchangeRateDao implements ExchangeRateRepository {
 
-    private final CurrencyDao currencyDao;
+    private final CurrencyRepository currencyRepository;
 
-    public JdbcExchangeRateDao(CurrencyDao currencyDao) {
-        this.currencyDao = currencyDao;
+    public JdbcExchangeRateDao(CurrencyRepository currencyRepository) {
+        this.currencyRepository = currencyRepository;
     }
 
     @Override
@@ -66,8 +66,8 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
             while (resultSet.next()) {
                 EntityExchangeRate entityExchangeRate = EntityExchangeRate.builder()
                         .id(resultSet.getInt("id"))
-                        .baseCurrency(currencyDao.findById(resultSet.getInt("base_currency_id")))
-                        .targetCurrency(currencyDao.findById(resultSet.getInt("target_currency_id")))
+                        .baseCurrency(currencyRepository.findById(resultSet.getInt("base_currency_id")))
+                        .targetCurrency(currencyRepository.findById(resultSet.getInt("target_currency_id")))
                         .rate(resultSet.getBigDecimal("rate"))
                         .build();
 
@@ -94,8 +94,8 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
             if (resultSet.next()) {
                 return EntityExchangeRate.builder()
                         .id(resultSet.getInt("id"))
-                        .baseCurrency(currencyDao.findById(resultSet.getInt("base_currency_id")))
-                        .targetCurrency(currencyDao.findById(resultSet.getInt("target_currency_id")))
+                        .baseCurrency(currencyRepository.findById(resultSet.getInt("base_currency_id")))
+                        .targetCurrency(currencyRepository.findById(resultSet.getInt("target_currency_id")))
                         .rate(resultSet.getBigDecimal("rate"))
                         .build();
             } else {
@@ -142,8 +142,8 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
 
                 return EntityExchangeRate.builder()
                         .id(idExchangeRate)
-                        .baseCurrency(currencyDao.findById(idBaseCurrency))
-                        .targetCurrency(currencyDao.findById(idTargetCurrency))
+                        .baseCurrency(currencyRepository.findById(idBaseCurrency))
+                        .targetCurrency(currencyRepository.findById(idTargetCurrency))
                         .rate(rate)
                         .build();
             } else {

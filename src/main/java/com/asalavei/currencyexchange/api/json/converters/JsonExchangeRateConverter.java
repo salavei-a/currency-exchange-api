@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Converter for converting between {@link JsonExchangeRate} and {@link ExchangeRate}
  */
-public class JsonExchangeRateConverter implements JsonDtoConverter<Integer, JsonExchangeRate, ExchangeRate> {
+public class JsonExchangeRateConverter implements JsonDtoConverter<JsonExchangeRate, ExchangeRate> {
 
     private final JsonCurrencyConverter converter = new JsonCurrencyConverter();
 

@@ -1,7 +1,7 @@
 package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcCurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
@@ -13,18 +13,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Collection;
 
-public class CurrenciesServlet extends BaseServlet<Integer, JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
+public class CurrenciesServlet extends BaseServlet<JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
     public CurrenciesServlet() {
-        super(new CurrencyService(new JdbcCurrencyDao(), new EntityCurrencyConverter()), new JsonCurrencyConverter());
+        super(new JsonCurrencyConverter(), new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao()));
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Collection<Currency> dtoCurrencies = service.findAll();
-            Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(dtoCurrencies);
-
+            Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(service.findAll());
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonCurrencies);
         } catch (CEDatabaseUnavailableException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);

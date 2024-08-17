@@ -1,4 +1,4 @@
-package com.asalavei.currencyexchange.api.dbaccess.dao;
+package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class JdbcCurrencyDao implements CurrencyDao {
+public class JdbcCurrencyDao implements CurrencyRepository {
     @Override
     public EntityCurrency save(EntityCurrency entity) {
         try (Connection connection = ConnectionUtil.getConnection();

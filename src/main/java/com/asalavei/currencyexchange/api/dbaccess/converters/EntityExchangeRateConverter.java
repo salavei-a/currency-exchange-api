@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Converter for converting between {@link EntityExchangeRate} and {@link ExchangeRate}
  */
-public class EntityExchangeRateConverter implements EntityDtoConverter<Integer, EntityExchangeRate, ExchangeRate> {
+public class EntityExchangeRateConverter implements EntityDtoConverter<EntityExchangeRate, ExchangeRate> {
 
     private final EntityCurrencyConverter converter = new EntityCurrencyConverter();
 

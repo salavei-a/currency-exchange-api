@@ -1,9 +1,9 @@
 package com.asalavei.currencyexchange.api.controllers;
 
-import com.asalavei.currencyexchange.api.dto.BaseDto;
-import com.asalavei.currencyexchange.api.json.BaseJsonDto;
+import com.asalavei.currencyexchange.api.dto.Dto;
+import com.asalavei.currencyexchange.api.json.JsonDto;
 import com.asalavei.currencyexchange.api.json.converters.JsonDtoConverter;
-import com.asalavei.currencyexchange.api.services.CrudService;
+import com.asalavei.currencyexchange.api.services.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,20 +16,20 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BaseServlet<I extends Comparable<I>,
-        J extends BaseJsonDto<I>,
-        D extends BaseDto<I>,
-        C extends JsonDtoConverter<I, J, D>,
-        S extends CrudService<I, D>> extends HttpServlet {
+public abstract class BaseServlet<
+        J extends JsonDto,
+        D extends Dto,
+        C extends JsonDtoConverter<J, D>,
+        S extends Service> extends HttpServlet {
 
-    protected final S service;
     protected final C converter;
+    protected final S service;
 
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
-    protected BaseServlet(S service, C converter) {
-        this.service = service;
+    protected BaseServlet(C converter, S service) {
         this.converter = converter;
+        this.service = service;
     }
 
     protected <T> void writeJsonResponse(HttpServletResponse response, int statusCode, String errorMessage, T responseObject) {

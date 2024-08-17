@@ -1,10 +1,10 @@
-package com.asalavei.currencyexchange.api.dbaccess.dao;
+package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 
 import java.math.BigDecimal;
 
-public interface ExchangeRateDao extends BaseEntityDao<Integer, EntityExchangeRate> {
+public interface ExchangeRateRepository extends Repository<EntityExchangeRate> {
     EntityExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency);
 
     BigDecimal getRateByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency);

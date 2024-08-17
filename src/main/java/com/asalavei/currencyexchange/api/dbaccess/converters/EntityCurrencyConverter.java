@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Converter for converting between {@link EntityCurrency} and {@link Currency}
  */
-public class EntityCurrencyConverter implements EntityDtoConverter<Integer, EntityCurrency, Currency>{
+public class EntityCurrencyConverter implements EntityDtoConverter<EntityCurrency, Currency>{
     /**
      * Converts the {@link Currency dto} to the {@link EntityCurrency}
      *

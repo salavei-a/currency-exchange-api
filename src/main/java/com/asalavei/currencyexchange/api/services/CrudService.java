@@ -1,10 +1,10 @@
 package com.asalavei.currencyexchange.api.services;
 
-import com.asalavei.currencyexchange.api.dto.BaseDto;
+import com.asalavei.currencyexchange.api.dto.Dto;
 
 import java.util.Collection;
 
-public interface CrudService<I extends Comparable<I>, D extends BaseDto<I>> {
+public interface CrudService<D extends Dto> extends Service {
     D create(D dto);
 
     Collection<D> findAll();

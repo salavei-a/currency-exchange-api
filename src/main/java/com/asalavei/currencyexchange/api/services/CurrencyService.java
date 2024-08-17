@@ -1,21 +1,21 @@
 package com.asalavei.currencyexchange.api.services;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
-import com.asalavei.currencyexchange.api.dbaccess.dao.CurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.CurrencyRepository;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dto.Currency;
 
-public class CurrencyService extends BaseCrudService<Integer, Currency, EntityCurrency, EntityCurrencyConverter, CurrencyDao> {
+public class CurrencyService extends BaseCrudService<Currency, EntityCurrency, EntityCurrencyConverter, CurrencyRepository> {
 
-    public CurrencyService(CurrencyDao entityDao, EntityCurrencyConverter converter) {
-        super(entityDao, converter);
+    public CurrencyService(EntityCurrencyConverter converter, CurrencyRepository repository) {
+        super(converter, repository);
     }
 
     public Currency findByCode(String code) {
-        return converter.toDto(entityDao.findByCode(code));
+        return converter.toDto(repository.findByCode(code));
     }
 
     public Integer getIdByCode(String code) {
-        return entityDao.getIdByCode(code);
+        return repository.getIdByCode(code);
     }
 }

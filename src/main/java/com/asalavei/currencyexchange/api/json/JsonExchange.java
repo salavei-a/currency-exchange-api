@@ -2,7 +2,7 @@ package com.asalavei.currencyexchange.api.json;
 
 import java.math.BigDecimal;
 
-public class JsonExchange {
+public class JsonExchange implements JsonDto {
     private JsonCurrency baseCurrency;
     private JsonCurrency targetCurrency;
     private BigDecimal rate;

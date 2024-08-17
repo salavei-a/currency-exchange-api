@@ -1,13 +1,13 @@
 package com.asalavei.currencyexchange.api.dbaccess.entities;
 
-public abstract class BaseEntity<T extends Comparable<T>> {
-    private T id;
+public abstract class BaseEntity<I> implements Entity {
+    private I id;
 
-    public T getId() {
+    public I getId() {
         return id;
     }
 
-    public void setId(T id) {
+    public void setId(I id) {
         this.id = id;
     }
 }

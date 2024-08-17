@@ -1,11 +1,11 @@
 package com.asalavei.currencyexchange.api.json.converters;
 
-import com.asalavei.currencyexchange.api.dto.BaseDto;
-import com.asalavei.currencyexchange.api.json.BaseJsonDto;
+import com.asalavei.currencyexchange.api.dto.Dto;
+import com.asalavei.currencyexchange.api.json.JsonDto;
 
 import java.util.Collection;
 
-public interface JsonDtoConverter<I extends Comparable<I>, J extends BaseJsonDto<I>, D extends BaseDto<I>>{
+public interface JsonDtoConverter<J extends JsonDto, D extends Dto>{
     D toDto(J jsonDto);
 
     J toJsonDto(D dto);

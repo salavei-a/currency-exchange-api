@@ -2,8 +2,8 @@ package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcCurrencyDao;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcExchangeRateDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
@@ -20,13 +20,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
 
-public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
+public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
     public ExchangeRateServlet() {
-        super(new ExchangeRateService(new JdbcExchangeRateDao(new JdbcCurrencyDao()), new EntityExchangeRateConverter()), new JsonExchangeRateConverter());
+        super(new JsonExchangeRateConverter(), new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao(new JdbcCurrencyDao())));
     }
 
-    private final CurrencyService currencyService = new CurrencyService(new JdbcCurrencyDao(), new EntityCurrencyConverter());
+    private final CurrencyService currencyService = new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao());
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

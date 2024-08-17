@@ -1,6 +1,6 @@
 package com.asalavei.currencyexchange.api.json;
 
-public abstract class BaseJsonDto<I extends Comparable<I>> {
+public abstract class BaseJsonDto<I> implements JsonDto {
     private I id;
 
     public I getId() {

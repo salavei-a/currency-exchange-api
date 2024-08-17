@@ -8,7 +8,7 @@ import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class ExchangeService {
+public class ExchangeService implements Service {
     private final CurrencyService currencyService;
     private final ExchangeRateService exchangeRateService;
     private final String crossCurrencyCode;

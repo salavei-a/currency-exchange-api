@@ -2,8 +2,9 @@ package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcCurrencyDao;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcExchangeRateDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
+import com.asalavei.currencyexchange.api.dto.Exchange;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.json.JsonExchange;
@@ -11,29 +12,23 @@ import com.asalavei.currencyexchange.api.json.converters.JsonExchangeConverter;
 import com.asalavei.currencyexchange.api.services.CurrencyService;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import com.asalavei.currencyexchange.api.services.ExchangeService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class ExchangeServlet extends HttpServlet {
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final ExchangeService service;
-    private final JsonExchangeConverter converter;
+public class ExchangeServlet extends BaseServlet<JsonExchange, Exchange, JsonExchangeConverter, ExchangeService> {
 
     public ExchangeServlet() {
-        this.service = new ExchangeService(
-                new CurrencyService(new JdbcCurrencyDao(), new EntityCurrencyConverter()),
-                new ExchangeRateService(new JdbcExchangeRateDao(new JdbcCurrencyDao()), new EntityExchangeRateConverter()),
-                "USD");
-        this.converter = new JsonExchangeConverter();
+        super(new JsonExchangeConverter(),
+                new ExchangeService(
+                new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao()),
+                new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao(new JdbcCurrencyDao())),
+                "USD"));
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String baseCurrencyCode = request.getParameter("from");
         String targetCurrencyCode = request.getParameter("to");
@@ -59,24 +54,6 @@ public class ExchangeServlet extends HttpServlet {
             writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
         } catch (CEDatabaseUnavailableException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
-        }
-    }
-
-    protected <T> void writeJsonResponse(HttpServletResponse response, int statusCode, String errorMessage, T responseObject) {
-        try {
-            response.setStatus(statusCode);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            try (PrintWriter writer = response.getWriter()) {
-                if (errorMessage != null && !errorMessage.isEmpty()) {
-                    writer.write(String.format("{\"message\":\"%s\"}", errorMessage));
-                } else if (responseObject != null) {
-                    writer.write(objectMapper.writeValueAsString(responseObject));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

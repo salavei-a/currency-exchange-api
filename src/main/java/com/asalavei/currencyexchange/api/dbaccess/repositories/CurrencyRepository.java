@@ -1,8 +1,8 @@
-package com.asalavei.currencyexchange.api.dbaccess.dao;
+package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 
-public interface CurrencyDao extends BaseEntityDao<Integer, EntityCurrency> {
+public interface CurrencyRepository extends Repository<EntityCurrency> {
     EntityCurrency findById(Integer id);
 
     EntityCurrency findByCode(String code);

@@ -1,7 +1,7 @@
 package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
-import com.asalavei.currencyexchange.api.dbaccess.dao.JdbcCurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
@@ -11,10 +11,10 @@ import com.asalavei.currencyexchange.api.services.CurrencyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class CurrencyServlet extends BaseServlet<Integer, JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
+public class CurrencyServlet extends BaseServlet<JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
     public CurrencyServlet() {
-        super(new CurrencyService(new JdbcCurrencyDao(), new EntityCurrencyConverter()), new JsonCurrencyConverter());
+        super(new JsonCurrencyConverter(), new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao()));
     }
 
     @Override

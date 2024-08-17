@@ -3,22 +3,16 @@ package com.asalavei.currencyexchange.api.dto;
 /**
  * Immutable DTO for transferring currency data between business logic layers
  */
-public class Currency implements BaseDto<Integer> {
-    private final Integer id;
+public class Currency extends BaseDto<Integer> {
     private final String name;
     private final String code;
     private final String sign;
 
     public Currency(Integer id, String name, String code, String sign) {
-        this.id = id;
+        super(id);
         this.name = name;
         this.code = code;
         this.sign = sign;
-    }
-
-    @Override
-    public Integer getId() {
-        return id;
     }
 
     public String getName() {

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Converter for converting between {@link JsonCurrency} and {@link Currency}
  */
-public class JsonCurrencyConverter implements JsonDtoConverter<Integer, JsonCurrency, Currency> {
+public class JsonCurrencyConverter implements JsonDtoConverter<JsonCurrency, Currency> {
     /**
      * Converts the {@link JsonCurrency jsonDto} to the {@link Currency}
      *
