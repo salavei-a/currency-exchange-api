@@ -147,7 +147,7 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
                         .rate(rate)
                         .build();
             } else {
-                throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
+                throw new CENotFoundException("Not found exchange rate for this currency pair.");
             }
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
