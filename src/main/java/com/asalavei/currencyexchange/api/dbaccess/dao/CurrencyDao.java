@@ -7,5 +7,5 @@ public interface CurrencyDao extends BaseEntityDao<Integer, EntityCurrency> {
 
     EntityCurrency findByCode(String code);
 
-    int getIdByCode(String code);
+    Integer getIdByCode(String code);
 }

@@ -24,7 +24,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                int id = resultSet.getInt(1);
+                Integer id = resultSet.getInt(1);
 
                 return EntityCurrency.builder()
                         .id(id)
@@ -109,7 +109,7 @@ public class JdbcCurrencyDao implements CurrencyDao {
     }
 
     @Override
-    public int getIdByCode(String code) {
+    public Integer getIdByCode(String code) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM currencies WHERE code = ?")) {
             preparedStatement.setString(1, code);

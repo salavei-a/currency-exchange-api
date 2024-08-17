@@ -84,8 +84,8 @@ public class ExchangeRateServlet extends BaseServlet<Integer, JsonExchangeRate, 
 
         try {
             BigDecimal rate = new BigDecimal(rateParam);
-            int idBaseCurrency = currencyService.getIdByCode(pathInfo.substring(1, 4));
-            int idTargetCurrency = currencyService.getIdByCode(pathInfo.substring(4, 7));
+            Integer idBaseCurrency = currencyService.getIdByCode(pathInfo.substring(1, 4));
+            Integer idTargetCurrency = currencyService.getIdByCode(pathInfo.substring(4, 7));
 
             ExchangeRate dtoExchangeRate = service.update(rate, idBaseCurrency, idTargetCurrency);
             JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);

@@ -8,10 +8,7 @@ import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableExcepti
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -33,14 +30,14 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
             EntityCurrency targetCurrency = entity.getTargetCurrency();
             BigDecimal rate = entity.getRate();
 
-            preparedStatement.setInt(1, baseCurrency.getId());
-            preparedStatement.setInt(2, targetCurrency.getId());
+            preparedStatement.setObject(1, baseCurrency.getId(), Types.INTEGER);
+            preparedStatement.setObject(2, targetCurrency.getId(), Types.INTEGER);
             preparedStatement.setBigDecimal(3, rate);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                int id = resultSet.getInt(1);
+                Integer id = resultSet.getInt(1);
 
                 return EntityExchangeRate.builder()
                         .id(id)
@@ -89,8 +86,8 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
 
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setInt(1, idBaseCurrency);
-            preparedStatement.setInt(2, idTargetCurrency);
+            preparedStatement.setObject(1, idBaseCurrency, Types.INTEGER);
+            preparedStatement.setObject(2, idTargetCurrency, Types.INTEGER);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -110,12 +107,12 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
     }
 
     @Override
-    public BigDecimal getRateByCurrencyPair(int idBaseCurrency, int idTargetCurrency) {
+    public BigDecimal getRateByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT rate FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)")) {
-            preparedStatement.setInt(1, idBaseCurrency);
-            preparedStatement.setInt(2, idTargetCurrency);
+            preparedStatement.setObject(1, idBaseCurrency, Types.INTEGER);
+            preparedStatement.setObject(2, idTargetCurrency, Types.INTEGER);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -130,18 +127,18 @@ public class JdbcExchangeRateDao implements ExchangeRateDao {
     }
 
     @Override
-    public EntityExchangeRate update(BigDecimal rate, int idBaseCurrency, int idTargetCurrency) {
+    public EntityExchangeRate update(BigDecimal rate, Integer idBaseCurrency, Integer idTargetCurrency) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "UPDATE exchange_rates SET rate = ? WHERE (base_currency_id, target_currency_id) = (?, ?) RETURNING id")) {
             preparedStatement.setBigDecimal(1, rate);
-            preparedStatement.setInt(2, idBaseCurrency);
-            preparedStatement.setInt(3, idTargetCurrency);
+            preparedStatement.setObject(2, idBaseCurrency, Types.INTEGER);
+            preparedStatement.setObject(3, idTargetCurrency, Types.INTEGER);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                int idExchangeRate = resultSet.getInt(1);
+                Integer idExchangeRate = resultSet.getObject(1, Integer.class);
 
                 return EntityExchangeRate.builder()
                         .id(idExchangeRate)

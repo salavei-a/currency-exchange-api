@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 public interface ExchangeRateDao extends BaseEntityDao<Integer, EntityExchangeRate> {
     EntityExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency);
 
-    BigDecimal getRateByCurrencyPair(int idBaseCurrency, int idTargetCurrency);
+    BigDecimal getRateByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency);
 
-    EntityExchangeRate update(BigDecimal rate, int idBaseCurrency, int idTargetCurrency);
+    EntityExchangeRate update(BigDecimal rate, Integer idBaseCurrency, Integer idTargetCurrency);
 }

@@ -15,7 +15,7 @@ public class CurrencyService extends BaseCrudService<Integer, Currency, EntityCu
         return converter.toDto(entityDao.findByCode(code));
     }
 
-    public int getIdByCode(String code) {
+    public Integer getIdByCode(String code) {
         return entityDao.getIdByCode(code);
     }
 }
