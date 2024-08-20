@@ -1,7 +1,6 @@
 package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
-import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.Exchange;
@@ -9,8 +8,6 @@ import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableExcepti
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.json.JsonExchange;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeConverter;
-import com.asalavei.currencyexchange.api.services.CurrencyService;
-import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import com.asalavei.currencyexchange.api.services.ExchangeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,11 +18,7 @@ import java.math.RoundingMode;
 public class ExchangeServlet extends BaseServlet<JsonExchange, Exchange, JsonExchangeConverter, ExchangeService> {
 
     public ExchangeServlet() {
-        super(new JsonExchangeConverter(),
-                new ExchangeService(
-                new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao()),
-                new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao(new JdbcCurrencyDao())),
-                "USD"));
+        super(new JsonExchangeConverter(), new ExchangeService(new JdbcCurrencyDao(), new JdbcExchangeRateDao(), new EntityCurrencyConverter(),"USD"));
     }
 
     @Override

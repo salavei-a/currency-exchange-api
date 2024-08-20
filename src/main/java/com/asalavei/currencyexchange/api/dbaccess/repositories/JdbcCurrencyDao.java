@@ -11,11 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class JdbcCurrencyDao implements CurrencyRepository {
+
     @Override
     public EntityCurrency save(EntityCurrency entity) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING id"
+                     "INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING *"
              )) {
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setString(2, entity.getCode());
@@ -24,14 +25,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                Integer id = resultSet.getInt(1);
-
-                return EntityCurrency.builder()
-                        .id(id)
-                        .name(entity.getName())
-                        .code(entity.getCode())
-                        .sign(entity.getSign())
-                        .build();
+                return getEntityCurrency(resultSet);
             } else {
                 throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
             }
@@ -51,14 +45,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             Collection<EntityCurrency> currencies = new ArrayList<>();
 
             while (resultSet.next()) {
-                EntityCurrency entityCurrency = EntityCurrency.builder()
-                        .id(resultSet.getInt("id"))
-                        .name(resultSet.getString("full_name"))
-                        .code(resultSet.getString("code"))
-                        .sign(resultSet.getString("sign"))
-                        .build();
-
-                currencies.add(entityCurrency);
+                currencies.add(getEntityCurrency(resultSet));
             }
 
             return currencies;
@@ -68,44 +55,21 @@ public class JdbcCurrencyDao implements CurrencyRepository {
     }
 
     @Override
-    public EntityCurrency findById(Integer id) {
-        return findBy("SELECT * FROM currencies WHERE id = ?", id);
-    }
-
-    @Override
     public EntityCurrency findByCode(String code) {
-        return findBy("SELECT * FROM currencies WHERE code = ?", code);
-    }
-
-    public <T> EntityCurrency findBy(String query, T parameter) {
-        EntityCurrency entityCurrency = null;
-
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            if (parameter instanceof Integer) {
-                preparedStatement.setInt(1, (Integer) parameter);
-            } else if (parameter instanceof String) {
-                preparedStatement.setString(1, (String) parameter);
-            }
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies WHERE code = ?")) {
+            preparedStatement.setString(1, code);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                entityCurrency = EntityCurrency.builder()
-                        .id(resultSet.getInt("id"))
-                        .name(resultSet.getString("full_name"))
-                        .code(resultSet.getString("code"))
-                        .sign(resultSet.getString("sign"))
-                        .build();
+                return getEntityCurrency(resultSet);
             } else {
-                throw new CENotFoundException("Not found Currency with " + (parameter instanceof Integer ? "id" : "code") + " = " + parameter);
+                throw new CENotFoundException("Not found Currency with code = " + code);
             }
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
         }
-
-        return entityCurrency;
     }
 
     @Override
@@ -124,5 +88,14 @@ public class JdbcCurrencyDao implements CurrencyRepository {
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
         }
+    }
+
+    private EntityCurrency getEntityCurrency(ResultSet resultSet) throws SQLException {
+        return EntityCurrency.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("full_name"))
+                .code(resultSet.getString("code"))
+                .sign(resultSet.getString("sign"))
+                .build();
     }
 }

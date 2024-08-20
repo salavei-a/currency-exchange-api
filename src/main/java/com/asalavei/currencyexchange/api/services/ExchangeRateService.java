@@ -1,6 +1,7 @@
 package com.asalavei.currencyexchange.api.services;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
+import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.ExchangeRateRepository;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
@@ -13,15 +14,19 @@ public class ExchangeRateService extends BaseCrudService<ExchangeRate, EntityExc
         super(converter, repository);
     }
 
-    public ExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
-        return converter.toDto(repository.findByCurrencyPair(idBaseCurrency, idTargetCurrency));
+    public ExchangeRate create(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+        return save(EntityExchangeRate.builder()
+                .baseCurrency(EntityCurrency.builder().code(baseCurrencyCode).build())
+                .targetCurrency(EntityCurrency.builder().code(targetCurrencyCode).build())
+                .rate(rate)
+                .build());
     }
 
-    public BigDecimal getRateByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
-        return repository.getRateByCurrencyPair(idBaseCurrency, idTargetCurrency);
+    public ExchangeRate findByCurrencyPairCodes(String baseCurrencyCode, String targetCurrencyCode) {
+        return converter.toDto(repository.findByCurrencyPairCodes(baseCurrencyCode, targetCurrencyCode));
     }
 
-    public ExchangeRate update(BigDecimal rate, Integer idBaseCurrency, Integer idTargetCurrency) {
-        return converter.toDto(repository.update(rate, idBaseCurrency, idTargetCurrency));
+    public ExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+        return converter.toDto(repository.updateRate(baseCurrencyCode, targetCurrencyCode, rate));
     }
 }

@@ -1,16 +1,12 @@
 package com.asalavei.currencyexchange.api.controllers;
 
-import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
-import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
-import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
-import com.asalavei.currencyexchange.api.services.CurrencyService;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,10 +19,8 @@ import java.util.Map;
 public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
     public ExchangeRateServlet() {
-        super(new JsonExchangeRateConverter(), new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao(new JdbcCurrencyDao())));
+        super(new JsonExchangeRateConverter(), new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao()));
     }
-
-    private final CurrencyService currencyService = new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao());
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -48,10 +42,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         }
 
         try {
-            Currency dtoBaseCurrency = currencyService.findByCode(pathInfo.substring(1, 4));
-            Currency dtoTargetCurrency = currencyService.findByCode(pathInfo.substring(4, 7));
-
-            ExchangeRate dtoExchangeRate = service.findByCurrencyPair(dtoBaseCurrency.getId(), dtoTargetCurrency.getId());
+            ExchangeRate dtoExchangeRate = service.findByCurrencyPairCodes(pathInfo.substring(1, 4), pathInfo.substring(4, 7));
             JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
 
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);
@@ -82,11 +73,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         }
 
         try {
-            BigDecimal rate = new BigDecimal(rateParam);
-            Integer idBaseCurrency = currencyService.getIdByCode(pathInfo.substring(1, 4));
-            Integer idTargetCurrency = currencyService.getIdByCode(pathInfo.substring(4, 7));
-
-            ExchangeRate dtoExchangeRate = service.update(rate, idBaseCurrency, idTargetCurrency);
+            ExchangeRate dtoExchangeRate = service.updateRate(pathInfo.substring(1, 4), pathInfo.substring(4, 7), new BigDecimal(rateParam));
             JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
 
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);

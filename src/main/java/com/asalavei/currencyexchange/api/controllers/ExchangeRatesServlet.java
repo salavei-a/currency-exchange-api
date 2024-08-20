@@ -1,8 +1,6 @@
 package com.asalavei.currencyexchange.api.controllers;
 
-import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
-import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
@@ -10,7 +8,6 @@ import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableExcepti
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
-import com.asalavei.currencyexchange.api.services.CurrencyService;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,10 +18,8 @@ import java.util.Collection;
 public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
     public ExchangeRatesServlet() {
-        super(new JsonExchangeRateConverter(), new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao(new JdbcCurrencyDao())));
+        super(new JsonExchangeRateConverter(), new ExchangeRateService(new EntityExchangeRateConverter(), new JdbcExchangeRateDao()));
     }
-
-    private final CurrencyService currencyService = new CurrencyService(new EntityCurrencyConverter(), new JdbcCurrencyDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -51,15 +46,7 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
         }
 
         try {
-            BigDecimal rate = new BigDecimal(rateParam);
-
-            ExchangeRate exchangeRate = ExchangeRate.builder()
-                    .baseCurrency(currencyService.findByCode(baseCurrencyCode))
-                    .targetCurrency(currencyService.findByCode(targetCurrencyCode))
-                    .rate(rate)
-                    .build();
-
-            JsonExchangeRate savedJsonExchangeRate = converter.toJsonDto(service.create(exchangeRate));
+            JsonExchangeRate savedJsonExchangeRate = converter.toJsonDto(service.create(baseCurrencyCode, targetCurrencyCode, new BigDecimal(rateParam)));
             writeJsonResponse(response, HttpServletResponse.SC_CREATED, null, savedJsonExchangeRate);
         } catch (NumberFormatException e) {
             writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid rate format.", null);

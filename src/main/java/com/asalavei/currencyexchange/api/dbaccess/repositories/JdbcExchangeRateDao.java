@@ -14,37 +14,32 @@ import java.util.Collection;
 
 public class JdbcExchangeRateDao implements ExchangeRateRepository {
 
-    private final CurrencyRepository currencyRepository;
-
-    public JdbcExchangeRateDao(CurrencyRepository currencyRepository) {
-        this.currencyRepository = currencyRepository;
-    }
-
     @Override
     public EntityExchangeRate save(EntityExchangeRate entity) {
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO exchange_rates (base_currency_id, target_currency_id, rate) VALUES (?, ?, ?) RETURNING id"
-             )) {
-            EntityCurrency baseCurrency = entity.getBaseCurrency();
-            EntityCurrency targetCurrency = entity.getTargetCurrency();
-            BigDecimal rate = entity.getRate();
+        String query = "WITH inserted AS (" +
+                       "INSERT INTO exchange_rates (base_currency_id, target_currency_id, rate) " +
+                       "SELECT bc.id, tc.id, ? " +
+                       "FROM currencies bc " +
+                       "JOIN currencies tc ON tc.code = ? " +
+                       "WHERE bc.code = ? " +
+                       "RETURNING id, base_currency_id, target_currency_id, rate) " +
+                       "SELECT i.id AS exchange_rate_id, i.rate AS rate, " +
+                       "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code,  bc.sign AS base_currency_sign, " +
+                       "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign " +
+                       "FROM inserted i " +
+                       "JOIN currencies bc ON i.base_currency_id = bc.id " +
+                       "JOIN currencies tc ON i.target_currency_id = tc.id;";
 
-            preparedStatement.setObject(1, baseCurrency.getId(), Types.INTEGER);
-            preparedStatement.setObject(2, targetCurrency.getId(), Types.INTEGER);
-            preparedStatement.setBigDecimal(3, rate);
+        try (Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setBigDecimal(1, entity.getRate());
+            preparedStatement.setString(2, entity.getBaseCurrency().getCode());
+            preparedStatement.setString(3, entity.getTargetCurrency().getCode());
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                Integer id = resultSet.getInt(1);
-
-                return EntityExchangeRate.builder()
-                        .id(id)
-                        .baseCurrency(baseCurrency)
-                        .targetCurrency(targetCurrency)
-                        .rate(rate)
-                        .build();
+                return getEntityExchangeRate(resultSet);
             } else {
                 throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
             }
@@ -58,20 +53,20 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
 
     @Override
     public Collection<EntityExchangeRate> findAll() {
+        String query = "SELECT er.id AS exchange_rate_id, er.rate AS rate, " +
+                       "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code, bc.sign AS base_currency_sign, " +
+                       "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign " +
+                       "FROM exchange_rates er " +
+                       "JOIN currencies bc ON er.base_currency_id = bc.id " +
+                       "JOIN currencies tc ON er.target_currency_id = tc.id";
+
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM exchange_rates");
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             Collection<EntityExchangeRate> exchangeRates = new ArrayList<>();
 
             while (resultSet.next()) {
-                EntityExchangeRate entityExchangeRate = EntityExchangeRate.builder()
-                        .id(resultSet.getInt("id"))
-                        .baseCurrency(currencyRepository.findById(resultSet.getInt("base_currency_id")))
-                        .targetCurrency(currencyRepository.findById(resultSet.getInt("target_currency_id")))
-                        .rate(resultSet.getBigDecimal("rate"))
-                        .build();
-
-                exchangeRates.add(entityExchangeRate);
+                exchangeRates.add(getEntityExchangeRate(resultSet));
             }
 
             return exchangeRates;
@@ -81,23 +76,24 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
     }
 
     @Override
-    public EntityExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
-        String query = "SELECT * FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)";
+    public EntityExchangeRate findByCurrencyPairCodes(String baseCurrencyCode, String targetCurrencyCode) {
+        String query = "SELECT er.id AS exchange_rate_id, er.rate AS rate, " +
+                       "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code, bc.sign AS base_currency_sign, " +
+                       "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign " +
+                       "FROM exchange_rates er " +
+                       "JOIN currencies bc ON er.base_currency_id = bc.id " +
+                       "JOIN currencies tc ON er.target_currency_id = tc.id " +
+                       "WHERE (bc.code, tc.code) = (?, ?)";
 
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setObject(1, idBaseCurrency, Types.INTEGER);
-            preparedStatement.setObject(2, idTargetCurrency, Types.INTEGER);
+            preparedStatement.setString(1, baseCurrencyCode);
+            preparedStatement.setString(2, targetCurrencyCode);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return EntityExchangeRate.builder()
-                        .id(resultSet.getInt("id"))
-                        .baseCurrency(currencyRepository.findById(resultSet.getInt("base_currency_id")))
-                        .targetCurrency(currencyRepository.findById(resultSet.getInt("target_currency_id")))
-                        .rate(resultSet.getBigDecimal("rate"))
-                        .build();
+                return getEntityExchangeRate(resultSet);
             } else {
                 throw new CENotFoundException("Not found exchange rate for this currency pair.");
             }
@@ -107,12 +103,12 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
     }
 
     @Override
-    public BigDecimal getRateByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency) {
+    public BigDecimal getRateByCurrencyPairIds(Integer baseCurrencyId, Integer targetCurrencyId) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT rate FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)")) {
-            preparedStatement.setObject(1, idBaseCurrency, Types.INTEGER);
-            preparedStatement.setObject(2, idTargetCurrency, Types.INTEGER);
+            preparedStatement.setInt(1, baseCurrencyId);
+            preparedStatement.setInt(2, targetCurrencyId);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -127,30 +123,50 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
     }
 
     @Override
-    public EntityExchangeRate update(BigDecimal rate, Integer idBaseCurrency, Integer idTargetCurrency) {
+    public EntityExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+        String query = "UPDATE exchange_rates er " +
+                       "SET rate = ? " +
+                       "FROM currencies bc, currencies tc " +
+                       "WHERE (er.base_currency_id, er.target_currency_id) = (bc.id, tc.id) " +
+                       "AND (bc.code, tc.code) = (?, ?) " +
+                       "RETURNING er.id AS exchange_rate_id, er.rate AS rate, " +
+                       "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code, bc.sign AS base_currency_sign, " +
+                       "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign";
+
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "UPDATE exchange_rates SET rate = ? WHERE (base_currency_id, target_currency_id) = (?, ?) RETURNING id")) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setBigDecimal(1, rate);
-            preparedStatement.setObject(2, idBaseCurrency, Types.INTEGER);
-            preparedStatement.setObject(3, idTargetCurrency, Types.INTEGER);
+            preparedStatement.setString(2, baseCurrencyCode);
+            preparedStatement.setString(3, targetCurrencyCode);
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                Integer idExchangeRate = resultSet.getObject(1, Integer.class);
-
-                return EntityExchangeRate.builder()
-                        .id(idExchangeRate)
-                        .baseCurrency(currencyRepository.findById(idBaseCurrency))
-                        .targetCurrency(currencyRepository.findById(idTargetCurrency))
-                        .rate(rate)
-                        .build();
+                return getEntityExchangeRate(resultSet);
             } else {
                 throw new CENotFoundException("Not found exchange rate for this currency pair.");
             }
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
         }
+    }
+
+    private EntityExchangeRate getEntityExchangeRate(ResultSet resultSet) throws SQLException {
+        return EntityExchangeRate.builder()
+                .id(resultSet.getInt("exchange_rate_id"))
+                .baseCurrency(EntityCurrency.builder()
+                        .id(resultSet.getInt("base_currency_id"))
+                        .name(resultSet.getString("base_currency_name"))
+                        .code(resultSet.getString("base_currency_code"))
+                        .sign(resultSet.getString("base_currency_sign"))
+                        .build())
+                .targetCurrency(EntityCurrency.builder()
+                        .id(resultSet.getInt("target_currency_id"))
+                        .name(resultSet.getString("target_currency_name"))
+                        .code(resultSet.getString("target_currency_code"))
+                        .sign(resultSet.getString("target_currency_sign"))
+                        .build())
+                .rate(resultSet.getBigDecimal("rate"))
+                .build();
     }
 }

@@ -23,7 +23,11 @@ public abstract class BaseCrudService<
 
     @Override
     public D create(D dto) {
-        return converter.toDto(repository.save(converter.toEntity(dto)));
+        return save(converter.toEntity(dto));
+    }
+
+    protected D save(E entity) {
+        return converter.toDto(repository.save(entity));
     }
 
     @Override

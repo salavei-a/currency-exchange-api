@@ -5,9 +5,9 @@ import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import java.math.BigDecimal;
 
 public interface ExchangeRateRepository extends Repository<EntityExchangeRate> {
-    EntityExchangeRate findByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency);
+    EntityExchangeRate findByCurrencyPairCodes(String baseCurrencyCode, String targetCurrencyCode);
 
-    BigDecimal getRateByCurrencyPair(Integer idBaseCurrency, Integer idTargetCurrency);
+    BigDecimal getRateByCurrencyPairIds(Integer baseCurrencyId, Integer targetCurrencyId);
 
-    EntityExchangeRate update(BigDecimal rate, Integer idBaseCurrency, Integer idTargetCurrency);
+    EntityExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate);
 }
