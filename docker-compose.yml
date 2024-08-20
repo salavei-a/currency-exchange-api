@@ -2,7 +2,6 @@ version: "3.9"
 
 services:
   postgres:
-    container_name: currency-exchange-db
     image: postgres:14-alpine
     restart: always
     environment:
@@ -14,7 +13,7 @@ services:
 
   flyway:
     image: flyway/flyway:10-alpine
-    command: -url=jdbc:postgresql://currency-exchange-db:5432/currency_exchange -schemas=public -user=admin -password=admin -connectRetries=60 migrate
+    command: -url=jdbc:postgresql://postgres/currency_exchange -schemas=public -user=admin -password=admin -connectRetries=60 migrate
     depends_on:
       - postgres
     volumes:
