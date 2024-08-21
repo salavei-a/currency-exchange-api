@@ -12,27 +12,8 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
 
     @Override
     public EntityCurrency save(EntityCurrency entity) {
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING id, full_name, code, sign"
-             )) {
-            preparedStatement.setString(1, entity.getName());
-            preparedStatement.setString(2, entity.getCode());
-            preparedStatement.setString(3, entity.getSign());
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return extractEntity(resultSet);
-            } else {
-                throw new CEDatabaseException("Failed to insert new currency into database or retrieve the inserted record");
-            }
-        } catch (SQLException e) {
-            if (e.getSQLState().startsWith("23")) {
-                throw new CEAlreadyExists("Currency with the code '" + entity.getCode() + "' already exists");
-            }
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
-        }
+        return save("INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING id, full_name, code, sign",
+                entity.getName(), entity.getCode(), entity.getSign());
     }
 
     @Override

@@ -28,25 +28,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
                        "JOIN currencies bc ON i.base_currency_id = bc.id " +
                        "JOIN currencies tc ON i.target_currency_id = tc.id";
 
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setBigDecimal(1, entity.getRate());
-            preparedStatement.setString(2, entity.getTargetCurrency().getCode());
-            preparedStatement.setString(3, entity.getBaseCurrency().getCode());
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return extractEntity(resultSet);
-            } else {
-                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " required to save the exchange rate");
-            }
-        } catch (SQLException e) {
-            if (e.getSQLState().startsWith("23")) {
-                throw new CEAlreadyExists("Exchange rate for this currency pair already exists");
-            }
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
-        }
+        return save(query, entity.getRate(), entity.getTargetCurrency().getCode(), entity.getBaseCurrency().getCode());
     }
 
     @Override
