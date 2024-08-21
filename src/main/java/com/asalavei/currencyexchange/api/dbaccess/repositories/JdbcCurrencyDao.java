@@ -14,7 +14,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
     public EntityCurrency save(EntityCurrency entity) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING *"
+                     "INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING id, full_name, code, sign"
              )) {
             preparedStatement.setString(1, entity.getName());
             preparedStatement.setString(2, entity.getCode());
@@ -29,7 +29,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             }
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
-                throw new CEAlreadyExists("Currency with the code '" + entity.getCode() + "' already exists.");
+                throw new CEAlreadyExists("Currency with the code '" + entity.getCode() + "' already exists");
             }
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
@@ -38,7 +38,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
     @Override
     public Collection<EntityCurrency> findAll() {
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies");
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, full_name, code, sign FROM currencies");
              ResultSet resultSet = preparedStatement.executeQuery()) {
             Collection<EntityCurrency> currencies = new ArrayList<>();
 
@@ -55,7 +55,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
     @Override
     public EntityCurrency findByCode(String code) {
         try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies WHERE code = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, full_name, code, sign FROM currencies WHERE code = ?")) {
             preparedStatement.setString(1, code);
 
             ResultSet resultSet = preparedStatement.executeQuery();
