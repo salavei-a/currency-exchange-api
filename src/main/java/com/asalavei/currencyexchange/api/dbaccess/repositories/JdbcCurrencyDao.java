@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class JdbcCurrencyDao implements CurrencyRepository {
+public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements CurrencyRepository {
 
     @Override
     public EntityCurrency save(EntityCurrency entity) {
@@ -23,7 +23,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return getEntityCurrency(resultSet);
+                return extractEntity(resultSet);
             } else {
                 throw new CEDatabaseException("Failed to insert new currency into database or retrieve the inserted record");
             }
@@ -37,16 +37,8 @@ public class JdbcCurrencyDao implements CurrencyRepository {
 
     @Override
     public Collection<EntityCurrency> findAll() {
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, full_name, code, sign FROM currencies");
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            Collection<EntityCurrency> currencies = new ArrayList<>();
-
-            while (resultSet.next()) {
-                currencies.add(getEntityCurrency(resultSet));
-            }
-
-            return currencies;
+        try {
+            return findAll("SELECT id, full_name, code, sign FROM currencies");
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
@@ -61,7 +53,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return getEntityCurrency(resultSet);
+                return extractEntity(resultSet);
             } else {
                 throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code +"'");
             }
@@ -88,12 +80,23 @@ public class JdbcCurrencyDao implements CurrencyRepository {
         }
     }
 
-    private EntityCurrency getEntityCurrency(ResultSet resultSet) throws SQLException {
+    @Override
+    protected EntityCurrency extractEntity(ResultSet resultSet) throws SQLException {
         return EntityCurrency.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("full_name"))
                 .code(resultSet.getString("code"))
                 .sign(resultSet.getString("sign"))
                 .build();
+    }
+
+    @Override
+    protected Collection<EntityCurrency> extractEntities(ResultSet resultSet) throws SQLException {
+        Collection<EntityCurrency> currencies = new ArrayList<>();
+        while (resultSet.next()) {
+            currencies.add(extractEntity(resultSet));
+        }
+
+        return currencies;
     }
 }

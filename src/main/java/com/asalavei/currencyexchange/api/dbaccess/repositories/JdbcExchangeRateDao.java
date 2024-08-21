@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class JdbcExchangeRateDao implements ExchangeRateRepository {
+public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> implements ExchangeRateRepository {
 
     @Override
     public EntityExchangeRate save(EntityExchangeRate entity) {
@@ -37,7 +37,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return getEntityExchangeRate(resultSet);
+                return extractEntity(resultSet);
             } else {
                 throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " required to save the exchange rate");
             }
@@ -58,17 +58,8 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
                        "JOIN currencies bc ON er.base_currency_id = bc.id " +
                        "JOIN currencies tc ON er.target_currency_id = tc.id " +
                        "ORDER BY er.id";
-
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            Collection<EntityExchangeRate> exchangeRates = new ArrayList<>();
-
-            while (resultSet.next()) {
-                exchangeRates.add(getEntityExchangeRate(resultSet));
-            }
-
-            return exchangeRates;
+        try {
+            return findAll(query);
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
@@ -92,7 +83,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return getEntityExchangeRate(resultSet);
+                return extractEntity(resultSet);
             } else {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
@@ -141,7 +132,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                return getEntityExchangeRate(resultSet);
+                return extractEntity(resultSet);
             } else {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
@@ -150,7 +141,8 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
         }
     }
 
-    private EntityExchangeRate getEntityExchangeRate(ResultSet resultSet) throws SQLException {
+    @Override
+    protected EntityExchangeRate extractEntity(ResultSet resultSet) throws SQLException {
         return EntityExchangeRate.builder()
                 .id(resultSet.getInt("exchange_rate_id"))
                 .baseCurrency(EntityCurrency.builder()
@@ -167,5 +159,15 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
                         .build())
                 .rate(resultSet.getBigDecimal("rate"))
                 .build();
+    }
+
+    @Override
+    protected Collection<EntityExchangeRate> extractEntities(ResultSet resultSet) throws SQLException {
+        Collection<EntityExchangeRate> exchangeRates = new ArrayList<>();
+        while (resultSet.next()) {
+            exchangeRates.add(extractEntity(resultSet));
+        }
+
+        return exchangeRates;
     }
 }
