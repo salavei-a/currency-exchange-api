@@ -3,9 +3,7 @@ package com.asalavei.currencyexchange.api.dbaccess.repositories;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
-import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
-import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.*;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -45,9 +43,9 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             }
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
-                throw new CEAlreadyExists("Exchange rate for this currency pair already exists.");
+                throw new CEAlreadyExists("Exchange rate for this currency pair already exists");
             }
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
@@ -71,7 +69,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
 
             return exchangeRates;
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
@@ -95,10 +93,10 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             if (resultSet.next()) {
                 return getEntityExchangeRate(resultSet);
             } else {
-                throw new CENotFoundException("Not found exchange rate for this currency pair.");
+                throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
@@ -115,10 +113,10 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             if (resultSet.next()) {
                 return resultSet.getBigDecimal("rate");
             } else {
-                throw new CENotFoundException("Not found exchange rate for this currency pair.");
+                throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
@@ -144,10 +142,10 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             if (resultSet.next()) {
                 return getEntityExchangeRate(resultSet);
             } else {
-                throw new CENotFoundException("Not found exchange rate for this currency pair.");
+                throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 

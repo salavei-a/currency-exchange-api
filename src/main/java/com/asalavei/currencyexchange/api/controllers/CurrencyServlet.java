@@ -5,6 +5,7 @@ import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.converters.JsonCurrencyConverter;
 import com.asalavei.currencyexchange.api.services.CurrencyService;
@@ -22,8 +23,7 @@ public class CurrencyServlet extends BaseServlet<JsonCurrency, Currency, JsonCur
         String pathInfo = request.getPathInfo();
 
         if (pathInfo == null || pathInfo.length() != 4) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Currency code is missing in the URL request. "
-                    + "The currency code must contain 3 characters.", null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.CURRENCY_CODES_MISSING, null);
             return;
         }
 

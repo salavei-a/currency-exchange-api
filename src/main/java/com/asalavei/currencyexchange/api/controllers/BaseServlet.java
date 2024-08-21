@@ -1,6 +1,7 @@
 package com.asalavei.currencyexchange.api.controllers;
 
 import com.asalavei.currencyexchange.api.dto.Dto;
+import com.asalavei.currencyexchange.api.exceptions.CERuntimeException;
 import com.asalavei.currencyexchange.api.json.JsonDto;
 import com.asalavei.currencyexchange.api.json.converters.JsonDtoConverter;
 import com.asalavei.currencyexchange.api.services.Service;
@@ -78,7 +79,7 @@ public abstract class BaseServlet<
 
             return params;
         } catch (IOException e) {
-            throw new RuntimeException("Error reading form parameters.", e);
+            throw new CERuntimeException("Error reading form parameters", e);
         }
     }
 }

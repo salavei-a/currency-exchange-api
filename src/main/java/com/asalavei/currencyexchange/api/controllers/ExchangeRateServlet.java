@@ -5,6 +5,7 @@ import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateD
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
@@ -36,8 +37,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         String pathInfo = request.getPathInfo();
 
         if (pathInfo == null || pathInfo.length() != 7) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Currency pair codes are missing in the URL request. "
-                    + "The code for each currency in the pair must contain 3 characters.", null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.CURRENCY_CODES_MISSING, null);
             return;
         }
 
@@ -59,9 +59,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         String rateParam = params.get("rate");
 
         if (pathInfo == null || pathInfo.length() != 7) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
-                    "Currency pair codes are missing in the URL request. The code for each currency in the pair must contain 3 characters.",
-                    null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.CURRENCY_CODES_MISSING, null);
             return;
         }
 
@@ -73,7 +71,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         }
 
         try {
-            ExchangeRate dtoExchangeRate = service.updateRate(pathInfo.substring(1, 4), pathInfo.substring(4, 7), new BigDecimal(rateParam));
+            ExchangeRate dtoExchangeRate = service.updateRate(pathInfo.substring(1, 4).toUpperCase(), pathInfo.substring(4, 7).toUpperCase(), new BigDecimal(rateParam));
             JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
 
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);

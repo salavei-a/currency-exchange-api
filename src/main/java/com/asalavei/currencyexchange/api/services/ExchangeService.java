@@ -6,6 +6,7 @@ import com.asalavei.currencyexchange.api.dbaccess.repositories.ExchangeRateRepos
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.dto.Exchange;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -67,7 +68,7 @@ public class ExchangeService implements Service {
             BigDecimal crossToTargetCurrencyRate = exchangeRateRepository.getRateByCurrencyPairIds(crossCurrencyId, targetCurrency.getId());
             return crossToTargetCurrencyRate.divide(crossToBaseCurrencyRate, 6, RoundingMode.HALF_UP);
         } catch (CENotFoundException exception) {
-            throw new CENotFoundException("Not found exchange rate for this currency pair.");
+            throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
         }
     }
 

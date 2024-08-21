@@ -6,6 +6,7 @@ import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
@@ -40,8 +41,7 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
         if (baseCurrencyCode == null || baseCurrencyCode.length() != 3 ||
             targetCurrencyCode == null || targetCurrencyCode.length() != 3 ||
             rateParam == null || rateParam.isEmpty()) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Required form field is missing. "
-                    + "The code for each currency in the pair must contain 3 characters.", null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.CURRENCY_CODES_MISSING, null);
             return;
         }
 

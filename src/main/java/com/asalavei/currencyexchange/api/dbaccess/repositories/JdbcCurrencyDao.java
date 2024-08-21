@@ -2,9 +2,7 @@ package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
-import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
-import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,9 +29,9 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             }
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
-                throw new CEAlreadyExists("Currency with '" + entity.getCode() + "' code already exists.");
+                throw new CEAlreadyExists("Currency with the code '" + entity.getCode() + "' already exists.");
             }
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
@@ -50,7 +48,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
 
             return currencies;
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
@@ -65,10 +63,10 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             if (resultSet.next()) {
                 return getEntityCurrency(resultSet);
             } else {
-                throw new CENotFoundException("Not found Currency with code = " + code);
+                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, code));
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
@@ -83,10 +81,10 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             if (resultSet.next()) {
                 return resultSet.getInt("id");
             } else {
-                throw new CENotFoundException("Not found Currency with code = " + code);
+                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, code));
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException("Database is unavailable or an error occurred while processing the request. " + e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
         }
     }
 
