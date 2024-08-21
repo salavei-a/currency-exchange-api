@@ -22,17 +22,17 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
                        "WHERE bc.code = ? " +
                        "RETURNING id, base_currency_id, target_currency_id, rate) " +
                        "SELECT i.id AS exchange_rate_id, i.rate AS rate, " +
-                       "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code,  bc.sign AS base_currency_sign, " +
+                       "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code, bc.sign AS base_currency_sign, " +
                        "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign " +
                        "FROM inserted i " +
                        "JOIN currencies bc ON i.base_currency_id = bc.id " +
-                       "JOIN currencies tc ON i.target_currency_id = tc.id;";
+                       "JOIN currencies tc ON i.target_currency_id = tc.id";
 
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setBigDecimal(1, entity.getRate());
-            preparedStatement.setString(2, entity.getBaseCurrency().getCode());
-            preparedStatement.setString(3, entity.getTargetCurrency().getCode());
+            preparedStatement.setString(2, entity.getTargetCurrency().getCode());
+            preparedStatement.setString(3, entity.getBaseCurrency().getCode());
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -56,7 +56,8 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
                        "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign " +
                        "FROM exchange_rates er " +
                        "JOIN currencies bc ON er.base_currency_id = bc.id " +
-                       "JOIN currencies tc ON er.target_currency_id = tc.id";
+                       "JOIN currencies tc ON er.target_currency_id = tc.id " +
+                       "ORDER BY er.id";
 
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
