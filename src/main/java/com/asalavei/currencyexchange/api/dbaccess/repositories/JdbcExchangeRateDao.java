@@ -39,13 +39,13 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
             if (resultSet.next()) {
                 return getEntityExchangeRate(resultSet);
             } else {
-                throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
+                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " required to save the exchange rate");
             }
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
                 throw new CEAlreadyExists("Exchange rate for this currency pair already exists");
             }
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 
@@ -69,7 +69,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
 
             return exchangeRates;
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 
@@ -96,7 +96,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 
@@ -116,7 +116,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 
@@ -145,7 +145,7 @@ public class JdbcExchangeRateDao implements ExchangeRateRepository {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 

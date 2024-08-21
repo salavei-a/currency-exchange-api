@@ -49,7 +49,6 @@ public class ExchangeService implements Service {
         } catch (CENotFoundException e) {
             return getRateFromReverseOrCrossCurrency(baseCurrency, targetCurrency);
         }
-
     }
 
     private BigDecimal getRateFromReverseOrCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
@@ -62,12 +61,13 @@ public class ExchangeService implements Service {
     }
 
     private BigDecimal getRateViaCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
-        ensureCrossCurrencyId();
         try {
+            ensureCrossCurrencyId();
             BigDecimal crossToBaseCurrencyRate = exchangeRateRepository.getRateByCurrencyPairIds(crossCurrencyId, baseCurrency.getId());
             BigDecimal crossToTargetCurrencyRate = exchangeRateRepository.getRateByCurrencyPairIds(crossCurrencyId, targetCurrency.getId());
+
             return crossToTargetCurrencyRate.divide(crossToBaseCurrencyRate, 6, RoundingMode.HALF_UP);
-        } catch (CENotFoundException exception) {
+        } catch (CENotFoundException e) {
             throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
         }
     }

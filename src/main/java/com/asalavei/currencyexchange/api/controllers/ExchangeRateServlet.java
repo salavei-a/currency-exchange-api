@@ -3,7 +3,7 @@ package com.asalavei.currencyexchange.api.controllers;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
+import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
@@ -48,7 +48,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);
         } catch (CENotFoundException e) {
             writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }
@@ -71,7 +71,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         }
 
         try {
-            ExchangeRate dtoExchangeRate = service.updateRate(pathInfo.substring(1, 4).toUpperCase(), pathInfo.substring(4, 7).toUpperCase(), new BigDecimal(rateParam));
+            ExchangeRate dtoExchangeRate = service.updateRate(pathInfo.substring(1, 4), pathInfo.substring(4, 7), new BigDecimal(rateParam));
             JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
 
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);
@@ -79,7 +79,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
             writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid rate format.", null);
         } catch (CENotFoundException e) {
             writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }

@@ -4,7 +4,7 @@ import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConve
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
+import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.converters.JsonCurrencyConverter;
 import com.asalavei.currencyexchange.api.services.CurrencyService;
@@ -24,7 +24,7 @@ public class CurrenciesServlet extends BaseServlet<JsonCurrency, Currency, JsonC
         try {
             Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(service.findAll());
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonCurrencies);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }
@@ -55,7 +55,7 @@ public class CurrenciesServlet extends BaseServlet<JsonCurrency, Currency, JsonC
             writeJsonResponse(response, HttpServletResponse.SC_CREATED, null, savedJsonCurrency);
         } catch (CEAlreadyExists e) {
             writeJsonResponse(response, HttpServletResponse.SC_CONFLICT, e.getMessage(), null);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }

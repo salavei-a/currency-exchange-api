@@ -3,7 +3,7 @@ package com.asalavei.currencyexchange.api.controllers;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
+import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
@@ -34,7 +34,7 @@ public class CurrencyServlet extends BaseServlet<JsonCurrency, Currency, JsonCur
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonCurrency);
         } catch (CENotFoundException e) {
             writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }

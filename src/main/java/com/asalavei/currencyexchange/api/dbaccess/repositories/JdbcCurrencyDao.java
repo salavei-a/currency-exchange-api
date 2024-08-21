@@ -25,13 +25,13 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             if (resultSet.next()) {
                 return getEntityCurrency(resultSet);
             } else {
-                throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
+                throw new CEDatabaseException("Failed to insert new currency into database or retrieve the inserted record");
             }
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
                 throw new CEAlreadyExists("Currency with the code '" + entity.getCode() + "' already exists.");
             }
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 
@@ -48,7 +48,7 @@ public class JdbcCurrencyDao implements CurrencyRepository {
 
             return currencies;
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 
@@ -63,10 +63,10 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             if (resultSet.next()) {
                 return getEntityCurrency(resultSet);
             } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, code));
+                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code +"'");
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 
@@ -81,10 +81,10 @@ public class JdbcCurrencyDao implements CurrencyRepository {
             if (resultSet.next()) {
                 return resultSet.getInt("id");
             } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, code));
+                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code +"'"));
             }
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
     }
 

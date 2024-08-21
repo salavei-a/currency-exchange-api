@@ -3,10 +3,7 @@ package com.asalavei.currencyexchange.api.controllers;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
-import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
-import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
-import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
+import com.asalavei.currencyexchange.api.exceptions.*;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
@@ -27,7 +24,7 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
         try {
             Collection<JsonExchangeRate> jsonExchangeRates = converter.toJsonDto(service.findAll());
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRates);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }
@@ -54,7 +51,7 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
             writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
         } catch (CEAlreadyExists e) {
             writeJsonResponse(response, HttpServletResponse.SC_CONFLICT, e.getMessage(), null);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }

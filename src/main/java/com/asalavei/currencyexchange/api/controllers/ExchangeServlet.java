@@ -4,7 +4,7 @@ import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConve
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.Exchange;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseUnavailableException;
+import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.json.JsonExchange;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeConverter;
@@ -45,7 +45,7 @@ public class ExchangeServlet extends BaseServlet<JsonExchange, Exchange, JsonExc
             writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid amount format.", null);
         } catch (CENotFoundException e) {
             writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
-        } catch (CEDatabaseUnavailableException e) {
+        } catch (CEDatabaseException e) {
             writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
         }
     }
