@@ -48,7 +48,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
     }
 
     @Override
-    public EntityExchangeRate findByCurrencyPairCodes(String baseCurrencyCode, String targetCurrencyCode) {
+    public EntityExchangeRate findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
         String query = "SELECT er.id AS exchange_rate_id, er.rate AS rate, " +
                        "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code, bc.sign AS base_currency_sign, " +
                        "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign " +
@@ -75,7 +75,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
     }
 
     @Override
-    public BigDecimal getRateByCurrencyPairIds(Integer baseCurrencyId, Integer targetCurrencyId) {
+    public BigDecimal getRateByCurrencyIds(Integer baseCurrencyId, Integer targetCurrencyId) {
         try (Connection connection = ConnectionUtil.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT rate FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)")) {

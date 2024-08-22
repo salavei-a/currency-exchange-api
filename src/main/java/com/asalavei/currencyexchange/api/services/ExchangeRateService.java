@@ -22,8 +22,8 @@ public class ExchangeRateService extends BaseCrudService<ExchangeRate, EntityExc
                 .build());
     }
 
-    public ExchangeRate findByCurrencyPairCodes(String baseCurrencyCode, String targetCurrencyCode) {
-        return converter.toDto(repository.findByCurrencyPairCodes(baseCurrencyCode, targetCurrencyCode));
+    public ExchangeRate findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
+        return converter.toDto(repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode));
     }
 
     public ExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {

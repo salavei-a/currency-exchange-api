@@ -45,7 +45,7 @@ public class ExchangeService implements Service {
 
     private BigDecimal getExchangeRate(Currency baseCurrency, Currency targetCurrency) {
         try {
-            return exchangeRateRepository.getRateByCurrencyPairIds(baseCurrency.getId(), targetCurrency.getId());
+            return exchangeRateRepository.getRateByCurrencyIds(baseCurrency.getId(), targetCurrency.getId());
         } catch (CENotFoundException e) {
             return getRateFromReverseOrCrossCurrency(baseCurrency, targetCurrency);
         }
@@ -53,7 +53,7 @@ public class ExchangeService implements Service {
 
     private BigDecimal getRateFromReverseOrCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
         try {
-            BigDecimal reverseRate = exchangeRateRepository.getRateByCurrencyPairIds(targetCurrency.getId(), baseCurrency.getId());
+            BigDecimal reverseRate = exchangeRateRepository.getRateByCurrencyIds(targetCurrency.getId(), baseCurrency.getId());
             return BigDecimal.ONE.divide(reverseRate, 6, RoundingMode.HALF_UP);
         } catch (CENotFoundException e) {
             return getRateViaCrossCurrency(baseCurrency, targetCurrency);
@@ -63,8 +63,8 @@ public class ExchangeService implements Service {
     private BigDecimal getRateViaCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
         try {
             ensureCrossCurrencyId();
-            BigDecimal crossToBaseCurrencyRate = exchangeRateRepository.getRateByCurrencyPairIds(crossCurrencyId, baseCurrency.getId());
-            BigDecimal crossToTargetCurrencyRate = exchangeRateRepository.getRateByCurrencyPairIds(crossCurrencyId, targetCurrency.getId());
+            BigDecimal crossToBaseCurrencyRate = exchangeRateRepository.getRateByCurrencyIds(crossCurrencyId, baseCurrency.getId());
+            BigDecimal crossToTargetCurrencyRate = exchangeRateRepository.getRateByCurrencyIds(crossCurrencyId, targetCurrency.getId());
 
             return crossToTargetCurrencyRate.divide(crossToBaseCurrencyRate, 6, RoundingMode.HALF_UP);
         } catch (CENotFoundException e) {

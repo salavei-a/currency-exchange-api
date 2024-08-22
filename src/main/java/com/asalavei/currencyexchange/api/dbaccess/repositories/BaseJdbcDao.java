@@ -34,9 +34,9 @@ public abstract class BaseJdbcDao<E extends Entity> {
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
                 if (this instanceof JdbcCurrencyDao) {
-                    throw new CEAlreadyExists("Currency with the code '" + params[1] + "' already exists");
+                    throw new CEAlreadyExists(String.format("Currency with the code '%s' already exists", params[1]));
                 } else if (this instanceof JdbcExchangeRateDao) {
-                    throw new CEAlreadyExists("Exchange rate for this currency pair already exists");
+                    throw new CEAlreadyExists(String.format("Exchange rate from %s to %s already exists",  params[2], params[1]));
                 }
             }
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);

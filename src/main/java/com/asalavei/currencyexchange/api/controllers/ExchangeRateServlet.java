@@ -42,7 +42,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         }
 
         try {
-            ExchangeRate dtoExchangeRate = service.findByCurrencyPairCodes(pathInfo.substring(1, 4), pathInfo.substring(4, 7));
+            ExchangeRate dtoExchangeRate = service.findByCurrencyCodes(pathInfo.substring(1, 4), pathInfo.substring(4, 7));
             JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
 
             writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);
