@@ -17,4 +17,4 @@ services:
     depends_on:
       - postgres
     volumes:
-      - ./src/main/resources/db.migration:/flyway/sql
+      - ./src/main/resources/db/migration:/flyway/sql
