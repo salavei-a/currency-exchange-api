@@ -23,22 +23,7 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
 
     @Override
     public EntityCurrency findByCode(String code) {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, full_name, code, sign FROM currencies WHERE code = ?")) {
-            preparedStatement.setString(1, code);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return extractEntity(resultSet);
-            } else {
-                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code + "'");
-            }
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
-        } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
-        }
+        return findByCode("SELECT id, full_name, code, sign FROM currencies WHERE code = ?", code);
     }
 
     @Override

@@ -53,6 +53,38 @@ public abstract class BaseJdbcDao<E extends Entity> {
         }
     }
 
+    protected E findByCode(String query, String code) {
+        return findByCodes(query, code, null);
+    }
+
+    protected E findByCodes(String query, String baseCurrencyCode, String targetCurrencyCode) {
+        try (Connection connection = ConnectionManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, baseCurrencyCode);
+
+            if (targetCurrencyCode != null) {
+                preparedStatement.setString(2, targetCurrencyCode);
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return extractEntity(resultSet);
+            } else {
+                if (this instanceof JdbcCurrencyDao) {
+                    throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + baseCurrencyCode + "'");
+                } else {
+                    throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
+                }
+            }
+        } catch (NoClassDefFoundError e) {
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
+        } catch (SQLException e) {
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
+        }
+
+    }
+
     private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
             preparedStatement.setObject(i + 1, params[i]);

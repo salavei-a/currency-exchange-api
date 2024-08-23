@@ -55,23 +55,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
                        "JOIN currencies tc ON er.target_currency_id = tc.id " +
                        "WHERE (bc.code, tc.code) = (?, ?)";
 
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setString(1, baseCurrencyCode);
-            preparedStatement.setString(2, targetCurrencyCode);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return extractEntity(resultSet);
-            } else {
-                throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
-            }
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
-        } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
-        }
+        return findByCodes(query, baseCurrencyCode, targetCurrencyCode);
     }
 
     @Override
