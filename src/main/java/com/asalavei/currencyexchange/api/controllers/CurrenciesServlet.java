@@ -5,6 +5,7 @@ import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CEAlreadyExists;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.converters.JsonCurrencyConverter;
 import com.asalavei.currencyexchange.api.services.CurrencyService;
@@ -38,9 +39,7 @@ public class CurrenciesServlet extends BaseServlet<JsonCurrency, Currency, JsonC
         if (code == null || code.length() != 3 ||
             name == null || name.isEmpty() ||
             sign == null || sign.isEmpty()) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
-                    "Required form field is missing. The currency code must contain 3 characters.",
-                    null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.INPUT_DATA_MISSING, null);
             return;
         }
 

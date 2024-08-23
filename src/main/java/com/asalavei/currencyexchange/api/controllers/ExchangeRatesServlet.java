@@ -38,7 +38,7 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
         if (baseCurrencyCode == null || baseCurrencyCode.length() != 3 ||
             targetCurrencyCode == null || targetCurrencyCode.length() != 3 ||
             rateParam == null || rateParam.isEmpty()) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.CURRENCY_CODES_MISSING, null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.INPUT_DATA_MISSING, null);
             return;
         }
 

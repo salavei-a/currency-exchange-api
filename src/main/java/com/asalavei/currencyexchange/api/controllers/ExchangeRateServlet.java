@@ -37,7 +37,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         String pathInfo = request.getPathInfo();
 
         if (pathInfo == null || pathInfo.length() != 7) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.CURRENCY_CODES_MISSING, null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.INPUT_DATA_MISSING, null);
             return;
         }
 
@@ -59,7 +59,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         String rateParam = params.get("rate");
 
         if (pathInfo == null || pathInfo.length() != 7) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.CURRENCY_CODES_MISSING, null);
+            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.INPUT_DATA_MISSING, null);
             return;
         }
 
