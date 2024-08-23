@@ -1,9 +1,9 @@
-INSERT INTO currencies (full_name, code, sign)
-VALUES ('US Dollar', 'USD', '$'),
-       ('Euro', 'EUR', '€'),
-       ('Russian Ruble', 'RUB', '₽'),
-       ('Georgian lari', 'GEL', '₾'),
-       ('Belarussian Ruble', 'BYN', 'Br');
+INSERT INTO currencies (code, full_name, sign)
+VALUES ('USD', 'US Dollar', '$'),
+       ('EUR', 'Euro', '€'),
+       ('RUB', 'Russian Ruble', '₽'),
+       ('GEL', 'Georgian lari', '₾'),
+       ('BYN', 'Belarussian Ruble', 'Br');
 
 DO $$
 DECLARE
