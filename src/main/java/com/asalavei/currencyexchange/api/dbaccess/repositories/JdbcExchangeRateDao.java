@@ -2,7 +2,7 @@ package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
-import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
+import com.asalavei.currencyexchange.api.dbaccess.ConnectionManager;
 import com.asalavei.currencyexchange.api.exceptions.*;
 
 import java.math.BigDecimal;
@@ -40,11 +40,9 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
                        "JOIN currencies bc ON er.base_currency_id = bc.id " +
                        "JOIN currencies tc ON er.target_currency_id = tc.id " +
                        "ORDER BY er.id";
-        try {
-            return findAll(query);
-        } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
-        }
+
+        return findAll(query);
+
     }
 
     @Override
@@ -57,7 +55,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
                        "JOIN currencies tc ON er.target_currency_id = tc.id " +
                        "WHERE (bc.code, tc.code) = (?, ?)";
 
-        try (Connection connection = ConnectionUtil.getConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, baseCurrencyCode);
             preparedStatement.setString(2, targetCurrencyCode);
@@ -69,6 +67,8 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             } else {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
+        } catch (NoClassDefFoundError e) {
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
@@ -76,7 +76,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
 
     @Override
     public BigDecimal getRateByCurrencyIds(Integer baseCurrencyId, Integer targetCurrencyId) {
-        try (Connection connection = ConnectionUtil.getConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(
                      "SELECT rate FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)")) {
             preparedStatement.setInt(1, baseCurrencyId);
@@ -89,6 +89,8 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             } else {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
+        } catch (NoClassDefFoundError e) {
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
@@ -105,7 +107,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
                        "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code, bc.sign AS base_currency_sign, " +
                        "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign";
 
-        try (Connection connection = ConnectionUtil.getConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setBigDecimal(1, rate);
             preparedStatement.setString(2, baseCurrencyCode);
@@ -118,6 +120,8 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             } else {
                 throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
             }
+        } catch (NoClassDefFoundError e) {
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }

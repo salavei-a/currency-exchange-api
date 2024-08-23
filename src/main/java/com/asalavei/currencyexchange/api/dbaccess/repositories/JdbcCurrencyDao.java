@@ -1,7 +1,7 @@
 package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
-import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
+import com.asalavei.currencyexchange.api.dbaccess.ConnectionManager;
 import com.asalavei.currencyexchange.api.exceptions.*;
 
 import java.sql.*;
@@ -18,16 +18,12 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
 
     @Override
     public Collection<EntityCurrency> findAll() {
-        try {
-            return findAll("SELECT id, full_name, code, sign FROM currencies");
-        } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
-        }
+        return findAll("SELECT id, full_name, code, sign FROM currencies");
     }
 
     @Override
     public EntityCurrency findByCode(String code) {
-        try (Connection connection = ConnectionUtil.getConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, full_name, code, sign FROM currencies WHERE code = ?")) {
             preparedStatement.setString(1, code);
 
@@ -36,8 +32,10 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
             if (resultSet.next()) {
                 return extractEntity(resultSet);
             } else {
-                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code +"'");
+                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code + "'");
             }
+        } catch (NoClassDefFoundError e) {
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
@@ -45,7 +43,7 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
 
     @Override
     public Integer getIdByCode(String code) {
-        try (Connection connection = ConnectionUtil.getConnection();
+        try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM currencies WHERE code = ?")) {
             preparedStatement.setString(1, code);
 
@@ -54,8 +52,10 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
             if (resultSet.next()) {
                 return resultSet.getInt("id");
             } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code +"'"));
+                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code + "'"));
             }
+        } catch (NoClassDefFoundError e) {
+            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
         }
