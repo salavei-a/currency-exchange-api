@@ -1,0 +1,140 @@
+### Get all currencies - 200 OK
+GET http://localhost:8080/currencies
+Accept: application/json
+
+### Create currency - 201 Created
+POST http://localhost:8080/currencies
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+name=Pound Sterling &
+code=GBP &
+sign=£
+
+### Create currency - 400 Bad Request
+### Invalid or missing input data
+POST http://localhost:8080/currencies
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+name= &
+code=GBP &
+sign=£
+
+### Create currency - 409 Conflict
+### Currency already exists in the database
+POST http://localhost:8080/currencies
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+name=Pound Sterling &
+code=GBP &
+sign=£
+
+### Get currency by code - 200 OK
+GET http://localhost:8080/currency/EUR
+Accept: application/json
+
+### Get currency by code - 400 Bad Request
+### Invalid or missing input data
+GET http://localhost:8080/currency/
+Accept: application/json
+
+### Get currency by code - 404 Not Found
+### Currency not found in the database
+GET http://localhost:8080/currency/CHF
+Accept: application/json
+
+### Get all exchange rate - 200 OK
+GET http://localhost:8080/exchangeRates
+Accept: application/json
+
+### Get exchange rate by currency codes - 200 OK
+GET http://localhost:8080/exchangeRate/USDGEL
+Accept: application/json
+
+### Get exchange rate by currency codes - 400 Bad Request
+### Invalid or missing input data
+GET http://localhost:8080/exchangeRate/USD
+Accept: application/json
+
+### Get exchange rate by currency codes - 404 Not Found
+### Exchange rate not found in the database
+GET http://localhost:8080/exchangeRate/GELEUR
+Accept: application/json
+
+### Create exchange rate - 201 Created
+POST http://localhost:8080/exchangeRates
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode=GEL &
+targetCurrencyCode=BYN &
+rate=1.212499
+
+### Create exchange rate - 400 Bad Request
+### Invalid or missing input data
+POST http://localhost:8080/exchangeRates
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode=GE &
+targetCurrencyCode=BYN &
+rate=1.212499
+
+### Create exchange rate - 409 Conflict
+#### Exchange rate already exists in the database
+POST http://localhost:8080/exchangeRates
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode=GEL &
+targetCurrencyCode=BYN &
+rate=1.212499
+
+### Create exchange rate - 404 Not Found
+#### Currency required to save the exchange rate not found
+POST http://localhost:8080/exchangeRates
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode=PHP &
+targetCurrencyCode=BYN &
+rate=1.212499
+
+### Update exchange rate - 200 OK
+PATCH http://localhost:8080/exchangeRate/USDRUB
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+rate=91.496732
+
+### Update exchange rate - 400 Bad Request
+### Invalid or missing input data
+PATCH http://localhost:8080/exchangeRate/USDRUB
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+rate=
+
+### Update exchange rate - 404 Not Found
+### Currency pair not found in the database
+PATCH http://localhost:8080/exchangeRate/BYNRUB
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+rate=91.496732
+
+### Exchange - 200 OK
+GET http://localhost:8080/exchange?from=USD&to=RUB&amount=100
+Accept: application/json
+
+### Exchange - 400 Bad Request
+### Invalid or missing input data
+GET http://localhost:8080/exchange?from=UD&to=RUB&amount=100
+Accept: application/json
+
+### Exchange - 404 Not Found
+#### Currency not found in the database
+GET http://localhost:8080/exchange?from=UST&to=RUB&amount=100
+Accept: application/json
