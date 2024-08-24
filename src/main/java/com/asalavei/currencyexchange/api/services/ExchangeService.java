@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class ExchangeService implements Service {
+
     private final CurrencyRepository currencyRepository;
     private final ExchangeRateRepository exchangeRateRepository;
     private final EntityCurrencyConverter converter;
@@ -25,10 +26,12 @@ public class ExchangeService implements Service {
         this.crossCurrencyCode = crossCurrencyCode;
     }
 
-    public Exchange exchange(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
-        Currency baseCurrency = converter.toDto(currencyRepository.findByCode(baseCurrencyCode));
-        Currency targetCurrency = converter.toDto(currencyRepository.findByCode(targetCurrencyCode));
+    public Exchange exchange(Exchange dto) {
+        Currency baseCurrency = converter.toDto(currencyRepository.findByCode(dto.getBaseCurrency().getCode()));
+        Currency targetCurrency = converter.toDto(currencyRepository.findByCode(dto.getTargetCurrency().getCode()));
+
         BigDecimal rate = getExchangeRate(baseCurrency, targetCurrency);
+        BigDecimal amount = dto.getAmount();
 
         return Exchange.builder()
                 .baseCurrency(baseCurrency)

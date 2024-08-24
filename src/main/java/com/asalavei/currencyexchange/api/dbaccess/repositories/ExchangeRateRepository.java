@@ -9,5 +9,5 @@ public interface ExchangeRateRepository extends Repository<EntityExchangeRate> {
 
     BigDecimal getRateByCurrencyIds(Integer baseCurrencyId, Integer targetCurrencyId);
 
-    EntityExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate);
+    EntityExchangeRate update(EntityExchangeRate entity);
 }

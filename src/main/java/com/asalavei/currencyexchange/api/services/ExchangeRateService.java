@@ -6,19 +6,22 @@ import com.asalavei.currencyexchange.api.dbaccess.repositories.ExchangeRateRepos
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 
-import java.math.BigDecimal;
-
 public class ExchangeRateService extends BaseCrudService<ExchangeRate, EntityExchangeRate, EntityExchangeRateConverter, ExchangeRateRepository> {
 
     public ExchangeRateService(EntityExchangeRateConverter converter, ExchangeRateRepository repository) {
         super(converter, repository);
     }
 
-    public ExchangeRate create(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+    @Override
+    public ExchangeRate create(ExchangeRate entity) {
         return save(EntityExchangeRate.builder()
-                .baseCurrency(EntityCurrency.builder().code(baseCurrencyCode).build())
-                .targetCurrency(EntityCurrency.builder().code(targetCurrencyCode).build())
-                .rate(rate)
+                .baseCurrency(EntityCurrency.builder()
+                        .code(entity.getBaseCurrency().getCode())
+                        .build())
+                .targetCurrency(EntityCurrency.builder()
+                        .code(entity.getTargetCurrency().getCode())
+                        .build())
+                .rate(entity.getRate())
                 .build());
     }
 
@@ -26,7 +29,7 @@ public class ExchangeRateService extends BaseCrudService<ExchangeRate, EntityExc
         return converter.toDto(repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode));
     }
 
-    public ExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
-        return converter.toDto(repository.updateRate(baseCurrencyCode, targetCurrencyCode, rate));
+    public ExchangeRate update(ExchangeRate entity) {
+        return converter.toDto(repository.update(converter.toEntity(entity)));
     }
 }

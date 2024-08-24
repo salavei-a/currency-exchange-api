@@ -81,7 +81,10 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
     }
 
     @Override
-    public EntityExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+    public EntityExchangeRate update(EntityExchangeRate entity) {
+        String baseCurrencyCode = entity.getBaseCurrency().getCode();
+        String targetCurrencyCode = entity.getTargetCurrency().getCode();
+
         String query = "UPDATE exchange_rates er " +
                        "SET rate = ? " +
                        "FROM currencies bc, currencies tc " +
@@ -93,7 +96,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
 
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setBigDecimal(1, rate);
+            preparedStatement.setBigDecimal(1, entity.getRate());
             preparedStatement.setString(2, baseCurrencyCode);
             preparedStatement.setString(3, targetCurrencyCode);
 
@@ -102,7 +105,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             if (resultSet.next()) {
                 return extractEntity(resultSet);
             } else {
-                throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
+                throw new CENotFoundException("Currency pair " + baseCurrencyCode + "/" + targetCurrencyCode + " not found in the database");
             }
         } catch (NoClassDefFoundError e) {
             throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);

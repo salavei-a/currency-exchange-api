@@ -3,19 +3,18 @@ package com.asalavei.currencyexchange.api.controllers;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
-import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
-import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.CEInvalidInputData;
 import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
+import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Map;
 
 public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
@@ -36,51 +35,52 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
 
-        if (pathInfo == null || pathInfo.length() != 7) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.INPUT_DATA_MISSING, null);
-            return;
+        if (pathInfo.length() != 7) {
+            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_INVALID_OR_MISSING, "currency codes"));
         }
 
-        try {
-            ExchangeRate dtoExchangeRate = service.findByCurrencyCodes(pathInfo.substring(1, 4), pathInfo.substring(4, 7));
-            JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
+        String baseCurrencyCode = pathInfo.substring(1, 4);
+        String targetCurrencyCode = pathInfo.substring(4, 7);
 
-            writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);
-        } catch (CENotFoundException e) {
-            writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
-        } catch (CEDatabaseException e) {
-            writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
-        }
+        validateCurrencyCode(baseCurrencyCode);
+        validateCurrencyCode(targetCurrencyCode);
+
+        ExchangeRate exchangeRate = service.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
+        JsonExchangeRate jsonExchangeRate = converter.toJsonDto(exchangeRate);
+
+        writeJsonResponse(response, HttpServletResponse.SC_OK, jsonExchangeRate);
     }
 
-    protected void doPatch(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
-        Map<String, String> params = getFormParameters(request);
-        String rateParam = params.get("rate");
 
-        if (pathInfo == null || pathInfo.length() != 7) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, ExceptionMessages.INPUT_DATA_MISSING, null);
-            return;
+        if (pathInfo.length() != 7) {
+            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_INVALID_OR_MISSING, "currency codes"));
         }
 
-        if (rateParam == null || rateParam.isEmpty()) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
-                    "Rate value is missing.",
-                    null);
-            return;
+        String parameter = request.getReader().readLine();
+
+        if (StringUtils.isBlank(parameter) || !parameter.contains("rate=")) {
+            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_INVALID, "rate"));
         }
 
-        try {
-            ExchangeRate dtoExchangeRate = service.updateRate(pathInfo.substring(1, 4), pathInfo.substring(4, 7), new BigDecimal(rateParam));
-            JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
+        String rate = parameter.split("=")[1];
 
-            writeJsonResponse(response, HttpServletResponse.SC_OK, null, jsonExchangeRate);
-        } catch (NumberFormatException e) {
-            writeJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid rate format.", null);
-        } catch (CENotFoundException e) {
-            writeJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage(), null);
-        } catch (CEDatabaseException e) {
-            writeJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), null);
-        }
+        JsonExchangeRate requestJsonExchange = JsonExchangeRate.builder()
+                .baseCurrency(JsonCurrency.builder()
+                        .code(pathInfo.substring(1, 4))
+                        .build())
+                .targetCurrency(JsonCurrency.builder()
+                        .code(pathInfo.substring(4, 7))
+                        .build())
+                .rate(convertToBigDecimal(rate))
+                .build();
+
+        validate(requestJsonExchange);
+
+        ExchangeRate dtoExchangeRate = service.update(converter.toDto(requestJsonExchange));
+        JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
+
+        writeJsonResponse(response, HttpServletResponse.SC_OK, jsonExchangeRate);
     }
 }
