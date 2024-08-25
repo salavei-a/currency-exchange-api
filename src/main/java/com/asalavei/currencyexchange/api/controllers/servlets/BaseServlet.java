@@ -1,4 +1,4 @@
-package com.asalavei.currencyexchange.api.controllers;
+package com.asalavei.currencyexchange.api.controllers.servlets;
 
 import com.asalavei.currencyexchange.api.dto.Dto;
 import com.asalavei.currencyexchange.api.exceptions.CEInvalidInputData;

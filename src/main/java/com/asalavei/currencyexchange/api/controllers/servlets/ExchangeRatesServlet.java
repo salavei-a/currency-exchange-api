@@ -1,4 +1,4 @@
-package com.asalavei.currencyexchange.api.controllers;
+package com.asalavei.currencyexchange.api.controllers.servlets;
 
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
