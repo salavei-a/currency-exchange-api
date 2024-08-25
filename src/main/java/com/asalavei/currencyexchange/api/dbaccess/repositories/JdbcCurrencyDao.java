@@ -37,12 +37,10 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
             if (resultSet.next()) {
                 return resultSet.getInt("id");
             } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + code + "'"));
+                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code " + code);
             }
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
+            throw new CEDatabaseException("Failed to get currency id");
         }
     }
 

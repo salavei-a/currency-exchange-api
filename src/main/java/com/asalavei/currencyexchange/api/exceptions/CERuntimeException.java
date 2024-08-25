@@ -7,10 +7,10 @@ public class CERuntimeException extends RuntimeException {
     }
 
     public CERuntimeException(String message, Throwable cause) {
-        super(cause != null ? message + ". Cause: " + cause.getMessage() : message, cause);
+        super(message, cause);
     }
 
-    public CERuntimeException(String message, String info) {
-        super(String.format(message, info.isBlank() ? "" : info));
+    public CERuntimeException(String message, String details) {
+        super(String.format(message, details.isBlank() ? "" : details));
     }
 }

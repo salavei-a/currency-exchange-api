@@ -71,7 +71,7 @@ public class ExchangeService implements Service {
 
             return crossToTargetCurrencyRate.divide(crossToBaseCurrencyRate, 6, RoundingMode.HALF_UP);
         } catch (CENotFoundException e) {
-            throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
+            throw new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND, baseCurrency.getCode(), targetCurrency.getCode()));
         }
     }
 

@@ -21,24 +21,19 @@ public abstract class BaseJdbcDao<E extends Entity> {
             if (resultSet.next()) {
                 return extractEntity(resultSet);
             } else {
-                if (this instanceof JdbcExchangeRateDao) {
-                    throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " required to save the exchange rate");
-                } else {
-                    throw new CEDatabaseException(ExceptionMessages.SAVE_FAILED);
-                }
+                throwException(new CEDatabaseException(ExceptionMessages.SAVE_FAILED, " currency with code " + params[1] + " to the database"),
+                               new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " required to save the exchange rate in the database"));
             }
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseException(ExceptionMessages.SAVE_FAILED);
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
-                if (this instanceof JdbcCurrencyDao) {
-                    throw new CEAlreadyExists(String.format("Currency with the code '%s' already exists", params[1]));
-                } else if (this instanceof JdbcExchangeRateDao) {
-                    throw new CEAlreadyExists(String.format("Exchange rate from %s to %s already exists", params[2], params[1]));
-                }
+                throwException(new CEAlreadyExists(String.format("Currency with the code %s already exists", params[1])),
+                               new CEAlreadyExists(String.format("Exchange rate for the currency pair %s/%s already exists", params[2], params[1])));
             }
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
+            throwException(new CEDatabaseException(ExceptionMessages.SAVE_FAILED, " currency with code " + params[1] + ": database operation issue"),
+                           new CEDatabaseException(ExceptionMessages.SAVE_FAILED, " exchange rate: database operation issue"));
         }
+
+        throw new CEDatabaseException(ExceptionMessages.ERROR_PROCESSING_REQUEST);
     }
 
     protected Collection<E> findAll(String query) {
@@ -46,11 +41,12 @@ public abstract class BaseJdbcDao<E extends Entity> {
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             return extractEntities(resultSet);
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
+            throwException(new CEDatabaseException(ExceptionMessages.READ_FAILED, " currencies from the database"),
+                           new CEDatabaseException(ExceptionMessages.READ_FAILED, " exchange rates from the database"));
         }
+
+        throw new CEDatabaseException(ExceptionMessages.ERROR_PROCESSING_REQUEST);
     }
 
     protected E findByCode(String query, String code) {
@@ -71,18 +67,23 @@ public abstract class BaseJdbcDao<E extends Entity> {
             if (resultSet.next()) {
                 return extractEntity(resultSet);
             } else {
-                if (this instanceof JdbcCurrencyDao) {
-                    throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code '" + baseCurrencyCode + "'");
-                } else {
-                    throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
-                }
+                throwException(new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code " + baseCurrencyCode),
+                               new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND, baseCurrencyCode, targetCurrencyCode)));
             }
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
+            throwException(new CEDatabaseException(ExceptionMessages.READ_FAILED, " currency with the code " + baseCurrencyCode),
+                           new CEDatabaseException(ExceptionMessages.READ_FAILED, " exchange rate for the currency pair " + baseCurrencyCode + "/" + targetCurrencyCode));
         }
 
+        throw new CEDatabaseException(ExceptionMessages.ERROR_PROCESSING_REQUEST);
+    }
+
+    protected void throwException(CERuntimeException jdbcCurrencyDaoException, CERuntimeException jdbcExchangeRateDaoException) {
+        if (this instanceof JdbcCurrencyDao) {
+            throw jdbcCurrencyDaoException;
+        } else if (this instanceof JdbcExchangeRateDao) {
+            throw jdbcExchangeRateDaoException;
+        }
     }
 
     private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {

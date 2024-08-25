@@ -6,7 +6,7 @@ public class CENotFoundException extends CERuntimeException {
         this(message, "");
     }
 
-    public CENotFoundException(String message, String info) {
-        super(message, info);
+    public CENotFoundException(String message, String details) {
+        super(message, details);
     }
 }

@@ -71,12 +71,10 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             if (resultSet.next()) {
                 return resultSet.getBigDecimal("rate");
             } else {
-                throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
+                throw new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND, "IDs " + baseCurrencyId, targetCurrencyId));
             }
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
+            throw new CEDatabaseException("Failed to get exchange rate");
         }
     }
 
@@ -105,12 +103,10 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             if (resultSet.next()) {
                 return extractEntity(resultSet);
             } else {
-                throw new CENotFoundException("Currency pair " + baseCurrencyCode + "/" + targetCurrencyCode + " not found in the database");
+                throw new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND, baseCurrencyCode, targetCurrencyCode));
             }
-        } catch (NoClassDefFoundError e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE);
         } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_UNAVAILABLE, e);
+            throw new CEDatabaseException("Failed to update the exchange rate");
         }
     }
 
