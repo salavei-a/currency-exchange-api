@@ -118,7 +118,7 @@ Content-Type: application/x-www-form-urlencoded
 rate=1
 
 ### Update exchange rate - 404 Not Found
-### Currency pair not found in the database
+### Exchange rate not found in the database
 PATCH http://localhost:8080/exchangeRate/BYNRUB
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
@@ -135,6 +135,6 @@ GET http://localhost:8080/exchange?from=UST&to=RUB&amount=100
 Accept: application/json
 
 ### Exchange - 404 Not Found
-#### Currency not found in the database
+#### Exchange operation failed. Currency not found in the database
 GET http://localhost:8080/exchange?from=CAD&to=RUB&amount=100
 Accept: application/json
