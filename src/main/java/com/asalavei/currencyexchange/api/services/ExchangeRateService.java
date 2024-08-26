@@ -5,6 +5,8 @@ import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.ExchangeRateRepository;
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
+import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 
 public class ExchangeRateService extends BaseCrudService<ExchangeRate, EntityExchangeRate, EntityExchangeRateConverter, ExchangeRateRepository> {
 
@@ -26,7 +28,8 @@ public class ExchangeRateService extends BaseCrudService<ExchangeRate, EntityExc
     }
 
     public ExchangeRate findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
-        return converter.toDto(repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode));
+        return converter.toDto(repository.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode)
+                .orElseThrow(() -> new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND, baseCurrencyCode, targetCurrencyCode))));
     }
 
     public ExchangeRate update(ExchangeRate entity) {
