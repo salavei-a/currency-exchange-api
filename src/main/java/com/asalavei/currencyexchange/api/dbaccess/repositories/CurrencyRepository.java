@@ -2,8 +2,8 @@ package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 
-public interface CurrencyRepository extends Repository<EntityCurrency> {
-    EntityCurrency findByCode(String code);
+import java.util.Optional;
 
-    Integer getIdByCode(String code);
+public interface CurrencyRepository extends Repository<EntityCurrency> {
+    Optional<EntityCurrency> findByCode(String code);
 }

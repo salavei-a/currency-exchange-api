@@ -5,10 +5,13 @@ import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dbaccess.ConnectionManager;
 import com.asalavei.currencyexchange.api.exceptions.*;
 
-import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> implements ExchangeRateRepository {
 
@@ -46,7 +49,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
     }
 
     @Override
-    public EntityExchangeRate findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
+    public Optional<EntityExchangeRate> findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
         String query = "SELECT er.id AS exchange_rate_id, er.rate AS rate, " +
                        "bc.id AS base_currency_id, bc.full_name AS base_currency_name, bc.code AS base_currency_code, bc.sign AS base_currency_sign, " +
                        "tc.id AS target_currency_id, tc.full_name AS target_currency_name, tc.code AS target_currency_code, tc.sign AS target_currency_sign " +
@@ -56,26 +59,6 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
                        "WHERE (bc.code, tc.code) = (?, ?)";
 
         return findByCodes(query, baseCurrencyCode, targetCurrencyCode);
-    }
-
-    @Override
-    public BigDecimal getRateByCurrencyIds(Integer baseCurrencyId, Integer targetCurrencyId) {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "SELECT rate FROM exchange_rates WHERE (base_currency_id, target_currency_id) = (?, ?)")) {
-            preparedStatement.setInt(1, baseCurrencyId);
-            preparedStatement.setInt(2, targetCurrencyId);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return resultSet.getBigDecimal("rate");
-            } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND, "IDs " + baseCurrencyId, targetCurrencyId));
-            }
-        } catch (SQLException e) {
-            throw new CEDatabaseException("Failed to get exchange rate");
-        }
     }
 
     @Override
@@ -103,11 +86,21 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             if (resultSet.next()) {
                 return extractEntity(resultSet);
             } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND, baseCurrencyCode, targetCurrencyCode));
+                throw createExceptionForEmptyResultSet("update", baseCurrencyCode, targetCurrencyCode);
             }
         } catch (SQLException e) {
-            throw new CEDatabaseException("Failed to update the exchange rate");
+            throw createDatabaseException("update", baseCurrencyCode, targetCurrencyCode);
         }
+    }
+
+    @Override
+    protected Collection<EntityExchangeRate> extractEntities(ResultSet resultSet) throws SQLException {
+        Collection<EntityExchangeRate> exchangeRates = new ArrayList<>();
+        while (resultSet.next()) {
+            exchangeRates.add(extractEntity(resultSet));
+        }
+
+        return exchangeRates;
     }
 
     @Override
@@ -131,12 +124,35 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
     }
 
     @Override
-    protected Collection<EntityExchangeRate> extractEntities(ResultSet resultSet) throws SQLException {
-        Collection<EntityExchangeRate> exchangeRates = new ArrayList<>();
-        while (resultSet.next()) {
-            exchangeRates.add(extractEntity(resultSet));
+    protected CERuntimeException createAlreadyExistsException(Object... params) {
+        return new CEAlreadyExists(ExceptionMessages.ALREADY_EXISTS, String.format("%s/%s exchange rate", params[2], params[1]));
+    }
+
+    @Override
+    protected CERuntimeException createExceptionForEmptyResultSet(String operation, Object... params) {
+        String details;
+
+        switch (operation) {
+            case "save" -> details = String.format("%s/%s exchange rate: currency not found", params[1], params[2]);
+            case "update" -> throw new CENotFoundException(String.format("Failed to %s exchange rate: %s/%s exchange rate not found", operation, params[0], params[1]));
+            default -> throw new CEDatabaseException(String.format("Failed to %s exchange rate", operation));
         }
 
-        return exchangeRates;
+        return new CEDatabaseException(String.format("Failed to %s %s", operation, details));
+    }
+
+    @Override
+    protected CERuntimeException createDatabaseException(String operation, Object... params) {
+        String details;
+
+        switch (operation) {
+            case "save" -> details = String.format("%s/%s exchange rate to the database", params[1], params[2]);
+            case "read" -> details = String.format("%s/%s exchange rate from the database", params[0], params[1]);
+            case "read all" -> details = "exchange rates from the database";
+            case "update" -> details = String.format("%s/%s exchange rate in the database", params[0], params[1]);
+            default -> throw new CEDatabaseException(String.format("Failed to %s exchange rate", operation));
+        }
+
+        return new CEDatabaseException(String.format("Failed to %s %s", operation, details));
     }
 }

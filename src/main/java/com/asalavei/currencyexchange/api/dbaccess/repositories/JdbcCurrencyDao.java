@@ -1,12 +1,13 @@
 package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
-import com.asalavei.currencyexchange.api.dbaccess.ConnectionManager;
 import com.asalavei.currencyexchange.api.exceptions.*;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements CurrencyRepository {
 
@@ -22,26 +23,18 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
     }
 
     @Override
-    public EntityCurrency findByCode(String code) {
+    public Optional<EntityCurrency> findByCode(String code) {
         return findByCode("SELECT id, full_name, code, sign FROM currencies WHERE code = ?", code);
     }
 
     @Override
-    public Integer getIdByCode(String code) {
-        try (Connection connection = ConnectionManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM currencies WHERE code = ?")) {
-            preparedStatement.setString(1, code);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return resultSet.getInt("id");
-            } else {
-                throw new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with the code " + code);
-            }
-        } catch (SQLException e) {
-            throw new CEDatabaseException("Failed to get currency id");
+    protected Collection<EntityCurrency> extractEntities(ResultSet resultSet) throws SQLException {
+        Collection<EntityCurrency> currencies = new ArrayList<>();
+        while (resultSet.next()) {
+            currencies.add(extractEntity(resultSet));
         }
+
+        return currencies;
     }
 
     @Override
@@ -55,12 +48,27 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
     }
 
     @Override
-    protected Collection<EntityCurrency> extractEntities(ResultSet resultSet) throws SQLException {
-        Collection<EntityCurrency> currencies = new ArrayList<>();
-        while (resultSet.next()) {
-            currencies.add(extractEntity(resultSet));
+    protected CERuntimeException createExceptionForEmptyResultSet(String operation, Object... params) {
+        return createDatabaseException(operation, params);
+    }
+
+    @Override
+    protected CERuntimeException createAlreadyExistsException(Object... params) {
+        return new CEAlreadyExists(ExceptionMessages.ALREADY_EXISTS, String.format("currency with code %s", params[1]));
+
+    }
+
+    @Override
+    protected CERuntimeException createDatabaseException(String operation, Object... params) {
+        String details;
+
+        switch (operation) {
+            case "save" -> details = "currency with code " + params[1] + " to the database";
+            case "read" ->  details = "currency with code " + params[0] + " from the database";
+            case "read all" -> details = "currencies from the database";
+            default -> throw new CEDatabaseException(String.format("Failed to %s currency", operation));
         }
 
-        return currencies;
+        return new CEDatabaseException(String.format("Failed to %s %s", operation, details));
     }
 }
