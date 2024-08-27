@@ -1,4 +1,4 @@
-package com.asalavei.currencyexchange.api.controllers;
+package com.asalavei.currencyexchange.api.controllers.filters;
 
 import com.asalavei.currencyexchange.api.exceptions.*;
 import com.asalavei.currencyexchange.api.json.JsonMessage;
