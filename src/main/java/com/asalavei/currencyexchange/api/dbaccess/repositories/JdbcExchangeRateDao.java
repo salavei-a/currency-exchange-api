@@ -138,7 +138,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             case SAVE_OPERATION -> details = String.format(EXCHANGE_RATE + ": currency not found", params[1], params[2]);
             case UPDATE_OPERATION -> throw new CENotFoundException(String.format(ExceptionMessage.FAILED_OPERATION, operation,
                                     String.format("rate: " + EXCHANGE_RATE + " not found", params[0], params[1])));
-            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
+            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST_TO_DATABASE);
         }
 
         return new CEDatabaseException(String.format(ExceptionMessage.FAILED_OPERATION, operation, details));
@@ -153,7 +153,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
             case READ_OPERATION -> details = String.format(EXCHANGE_RATE + " from the database", params[0], params[1]);
             case READ_ALL_OPERATION -> details = "exchange rates from the database";
             case UPDATE_OPERATION -> details = String.format(EXCHANGE_RATE + " in the database", params[0], params[1]);
-            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
+            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST_TO_DATABASE);
         }
 
         return new CEDatabaseException(String.format(ExceptionMessage.FAILED_OPERATION, operation, details));

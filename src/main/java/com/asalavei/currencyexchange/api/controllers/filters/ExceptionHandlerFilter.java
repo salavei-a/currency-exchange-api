@@ -1,5 +1,6 @@
 package com.asalavei.currencyexchange.api.controllers.filters;
 
+import org.slf4j.Logger;
 import com.asalavei.currencyexchange.api.exceptions.*;
 import com.asalavei.currencyexchange.api.json.JsonMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,15 +9,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
 public class ExceptionHandlerFilter extends HttpFilter {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandlerFilter.class);
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -34,16 +37,14 @@ public class ExceptionHandlerFilter extends HttpFilter {
     }
 
     private void writeErrorResponse(HttpServletResponse response, int statusCode, CERuntimeException e) {
-        try {
-            response.setStatus(statusCode);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
+        response.setStatus(statusCode);
 
-            try (PrintWriter writer = response.getWriter()) {
-                writer.write(objectMapper.writeValueAsString(new JsonMessage(e.getMessage())));
-            }
+        try {
+            objectMapper.writeValue(response.getWriter(), new JsonMessage(e.getMessage()));
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.error(ExceptionMessage.ERROR_WRITING_RESPONSE, statusCode, ex);
+
+            throw new CERuntimeException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
     }
 }

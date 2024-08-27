@@ -67,7 +67,7 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
             case SAVE_OPERATION -> details = String.format(CURRENCY + " to the database", params[1]);
             case READ_OPERATION -> details = String.format(CURRENCY + " from the database", params[0]);
             case READ_ALL_OPERATION -> details = "currencies from the database";
-            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
+            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST_TO_DATABASE);
         }
 
         return new CEDatabaseException(String.format(ExceptionMessage.FAILED_OPERATION, operation, details));

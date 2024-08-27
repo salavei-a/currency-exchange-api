@@ -2,6 +2,7 @@ package com.asalavei.currencyexchange.api.controllers.servlets;
 
 import com.asalavei.currencyexchange.api.dto.Dto;
 import com.asalavei.currencyexchange.api.exceptions.CEInvalidInputData;
+import com.asalavei.currencyexchange.api.exceptions.CERuntimeException;
 import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.JsonDto;
@@ -14,9 +15,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Set;
@@ -28,15 +30,16 @@ public abstract class BaseServlet<
         C extends JsonDtoConverter<J, D>,
         S extends Service> extends HttpServlet {
 
+    private static final Logger logger = LoggerFactory.getLogger(BaseServlet.class);
+
     protected final C converter;
     protected final S service;
-
     protected final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final Set<String> currencyCodes;
 
     protected static final String RATE_PARAM = "rate";
     protected static final String AMOUNT_PARAM = "amount";
-
-    private static final Set<String> currencyCodes;
 
     static {
         currencyCodes = Currency.getAvailableCurrencies().stream()
@@ -50,16 +53,14 @@ public abstract class BaseServlet<
     }
 
     protected <T> void writeJsonResponse(HttpServletResponse response, int statusCode, T responseObject) {
-        try {
-            response.setStatus(statusCode);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
+        response.setStatus(statusCode);
 
-            try (PrintWriter writer = response.getWriter()) {
-                writer.write(objectMapper.writeValueAsString(responseObject));
-            }
+        try {
+            objectMapper.writeValue(response.getWriter(), responseObject);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(ExceptionMessage.ERROR_WRITING_RESPONSE, statusCode, e);
+
+            throw new CERuntimeException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
     }
 
