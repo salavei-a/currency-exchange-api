@@ -1,32 +1,24 @@
 package com.asalavei.currencyexchange.api.controllers.servlets;
 
-import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
-import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcCurrencyDao;
+import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.Exchange;
-import com.asalavei.currencyexchange.api.exceptions.CEInvalidInputData;
-import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.JsonExchange;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeConverter;
 import com.asalavei.currencyexchange.api.services.ExchangeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 
 public class ExchangeServlet extends BaseServlet<JsonExchange, Exchange, JsonExchangeConverter, ExchangeService> {
 
     public ExchangeServlet() {
-        super(new JsonExchangeConverter(), new ExchangeService(new JdbcCurrencyDao(), new JdbcExchangeRateDao(), new EntityCurrencyConverter(), "USD"));
+        super(new JsonExchangeConverter(), new ExchangeService(new JdbcExchangeRateDao(), new EntityExchangeRateConverter(), "USD"));
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        String amountParam = request.getParameter("amount");
-
-        if (StringUtils.isBlank(amountParam)) {
-            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_MISSING, "amount"));
-        }
+        String amount = getValidatedParam(request, AMOUNT_PARAM);
 
         JsonExchange requestJsonExchange = JsonExchange.builder()
                 .baseCurrency(JsonCurrency.builder()
@@ -35,10 +27,10 @@ public class ExchangeServlet extends BaseServlet<JsonExchange, Exchange, JsonExc
                 .targetCurrency(JsonCurrency.builder()
                         .code(request.getParameter("to"))
                         .build())
-                .amount(convertToBigDecimal(amountParam))
+                .amount(convertToBigDecimal(amount, AMOUNT_PARAM))
                 .build();
 
-        validate(requestJsonExchange);
+        validate(requestJsonExchange, AMOUNT_PARAM);
 
         Exchange exchangeDto = converter.toDto(requestJsonExchange);
         JsonExchange responseJsonExchange = converter.toJsonDto(service.exchange(exchangeDto));

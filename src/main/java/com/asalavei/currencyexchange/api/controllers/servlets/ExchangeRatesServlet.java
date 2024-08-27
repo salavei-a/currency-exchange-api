@@ -3,14 +3,12 @@ package com.asalavei.currencyexchange.api.controllers.servlets;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
-import com.asalavei.currencyexchange.api.exceptions.*;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
 import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 
@@ -28,11 +26,7 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        String rateParameter = request.getParameter("rate");
-
-        if (StringUtils.isBlank(rateParameter)) {
-            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_MISSING, "rate"));
-        }
+        String rate = getValidatedParam(request, RATE_PARAM);
 
         JsonExchangeRate requestJsonExchange = JsonExchangeRate.builder()
                 .baseCurrency(JsonCurrency.builder()
@@ -41,10 +35,10 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
                 .targetCurrency(JsonCurrency.builder()
                         .code(request.getParameter("targetCurrencyCode"))
                         .build())
-                .rate(convertToBigDecimal(rateParameter))
+                .rate(convertToBigDecimal(rate, RATE_PARAM))
                 .build();
 
-        validate(requestJsonExchange);
+        validate(requestJsonExchange, RATE_PARAM);
 
         ExchangeRate exchangeRateDto = converter.toDto(requestJsonExchange);
         JsonExchangeRate responseJsonExchange = converter.toJsonDto(service.create(exchangeRateDto));

@@ -3,8 +3,6 @@ package com.asalavei.currencyexchange.api.controllers.servlets;
 import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.JdbcExchangeRateDao;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
-import com.asalavei.currencyexchange.api.exceptions.CEInvalidInputData;
-import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.JsonExchangeRate;
 import com.asalavei.currencyexchange.api.json.converters.JsonExchangeRateConverter;
@@ -12,7 +10,6 @@ import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
@@ -35,9 +32,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
 
-        if (pathInfo.length() != 7) {
-            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_INVALID_OR_MISSING, "currency codes"));
-        }
+        validateCurrencyCodesLength(pathInfo);
 
         String baseCurrencyCode = pathInfo.substring(1, 4);
         String targetCurrencyCode = pathInfo.substring(4, 7);
@@ -51,20 +46,11 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         writeJsonResponse(response, HttpServletResponse.SC_OK, jsonExchangeRate);
     }
 
-    protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
+        String rate = getValidatedParamFromBody(request, RATE_PARAM);
 
-        if (pathInfo.length() != 7) {
-            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_INVALID_OR_MISSING, "currency codes"));
-        }
-
-        String parameter = request.getReader().readLine();
-
-        if (StringUtils.isBlank(parameter) || !parameter.contains("rate=")) {
-            throw new CEInvalidInputData(String.format(ExceptionMessages.INPUT_DATA_INVALID, "rate"));
-        }
-
-        String rate = parameter.split("=")[1];
+        validateCurrencyCodesLength(pathInfo);
 
         JsonExchangeRate requestJsonExchange = JsonExchangeRate.builder()
                 .baseCurrency(JsonCurrency.builder()
@@ -73,10 +59,10 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
                 .targetCurrency(JsonCurrency.builder()
                         .code(pathInfo.substring(4, 7))
                         .build())
-                .rate(convertToBigDecimal(rate))
+                .rate(convertToBigDecimal(rate, RATE_PARAM))
                 .build();
 
-        validate(requestJsonExchange);
+        validate(requestJsonExchange, RATE_PARAM);
 
         ExchangeRate dtoExchangeRate = service.update(converter.toDto(requestJsonExchange));
         JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
