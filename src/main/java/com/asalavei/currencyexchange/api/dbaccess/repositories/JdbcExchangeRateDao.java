@@ -15,6 +15,8 @@ import java.util.Optional;
 
 public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> implements ExchangeRateRepository {
 
+    private static final String EXCHANGE_RATE = "%s/%s exchange rate";
+
     @Override
     public EntityExchangeRate save(EntityExchangeRate entity) {
         String query = "WITH inserted AS (" +
@@ -125,7 +127,7 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
 
     @Override
     protected CERuntimeException createAlreadyExistsException(Object... params) {
-        return new CEAlreadyExists(ExceptionMessages.ALREADY_EXISTS, String.format("%s/%s exchange rate", params[2], params[1]));
+        return new CEAlreadyExists(String.format(ExceptionMessage.ALREADY_EXISTS, String.format(EXCHANGE_RATE, params[2], params[1])));
     }
 
     @Override
@@ -133,12 +135,13 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
         String details;
 
         switch (operation) {
-            case "save" -> details = String.format("%s/%s exchange rate: currency not found", params[1], params[2]);
-            case "update" -> throw new CENotFoundException(String.format("Failed to %s exchange rate: %s/%s exchange rate not found", operation, params[0], params[1]));
-            default -> throw new CEDatabaseException(String.format("Failed to %s exchange rate", operation));
+            case SAVE_OPERATION -> details = String.format(EXCHANGE_RATE + ": currency not found", params[1], params[2]);
+            case UPDATE_OPERATION -> throw new CENotFoundException(String.format(ExceptionMessage.FAILED_OPERATION, operation,
+                                    String.format("rate: " + EXCHANGE_RATE + " not found", params[0], params[1])));
+            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
 
-        return new CEDatabaseException(String.format("Failed to %s %s", operation, details));
+        return new CEDatabaseException(String.format(ExceptionMessage.FAILED_OPERATION, operation, details));
     }
 
     @Override
@@ -146,13 +149,13 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
         String details;
 
         switch (operation) {
-            case "save" -> details = String.format("%s/%s exchange rate to the database", params[1], params[2]);
-            case "read" -> details = String.format("%s/%s exchange rate from the database", params[0], params[1]);
-            case "read all" -> details = "exchange rates from the database";
-            case "update" -> details = String.format("%s/%s exchange rate in the database", params[0], params[1]);
-            default -> throw new CEDatabaseException(String.format("Failed to %s exchange rate", operation));
+            case SAVE_OPERATION -> details = String.format(EXCHANGE_RATE + " to the database", params[1], params[2]);
+            case READ_OPERATION -> details = String.format(EXCHANGE_RATE + " from the database", params[0], params[1]);
+            case READ_ALL_OPERATION -> details = "exchange rates from the database";
+            case UPDATE_OPERATION -> details = String.format(EXCHANGE_RATE + " in the database", params[0], params[1]);
+            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
 
-        return new CEDatabaseException(String.format("Failed to %s %s", operation, details));
+        return new CEDatabaseException(String.format(ExceptionMessage.FAILED_OPERATION, operation, details));
     }
 }

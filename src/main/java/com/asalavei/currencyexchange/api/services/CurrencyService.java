@@ -5,7 +5,7 @@ import com.asalavei.currencyexchange.api.dbaccess.repositories.CurrencyRepositor
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
-import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 
 public class CurrencyService extends BaseCrudService<Currency, EntityCurrency, EntityCurrencyConverter, CurrencyRepository> {
 
@@ -15,6 +15,6 @@ public class CurrencyService extends BaseCrudService<Currency, EntityCurrency, E
 
     public Currency findByCode(String code) {
         return converter.toDto(repository.findByCode(code)
-                .orElseThrow(() -> new CENotFoundException(ExceptionMessages.CURRENCY_NOT_FOUND, " with code " + code)));
+                .orElseThrow(() -> new CENotFoundException(String.format(ExceptionMessage.CURRENCY_NOT_FOUND, code))));
     }
 }

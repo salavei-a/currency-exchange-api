@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements CurrencyRepository {
 
+    private static final String CURRENCY = "currency with code %s";
+
     @Override
     public EntityCurrency save(EntityCurrency entity) {
         return save("INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING id, full_name, code, sign",
@@ -54,8 +56,7 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
 
     @Override
     protected CERuntimeException createAlreadyExistsException(Object... params) {
-        return new CEAlreadyExists(ExceptionMessages.ALREADY_EXISTS, String.format("currency with code %s", params[1]));
-
+        return new CEAlreadyExists(String.format(ExceptionMessage.ALREADY_EXISTS, String.format(CURRENCY, params[1])));
     }
 
     @Override
@@ -63,12 +64,12 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
         String details;
 
         switch (operation) {
-            case "save" -> details = "currency with code " + params[1] + " to the database";
-            case "read" ->  details = "currency with code " + params[0] + " from the database";
-            case "read all" -> details = "currencies from the database";
-            default -> throw new CEDatabaseException(String.format("Failed to %s currency", operation));
+            case SAVE_OPERATION -> details = String.format(CURRENCY + " to the database", params[1]);
+            case READ_OPERATION -> details = String.format(CURRENCY + " from the database", params[0]);
+            case READ_ALL_OPERATION -> details = "currencies from the database";
+            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
 
-        return new CEDatabaseException(String.format("Failed to %s %s", operation, details));
+        return new CEDatabaseException(String.format(ExceptionMessage.FAILED_OPERATION, operation, details));
     }
 }

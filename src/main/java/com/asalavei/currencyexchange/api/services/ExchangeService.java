@@ -7,7 +7,7 @@ import com.asalavei.currencyexchange.api.dto.Exchange;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
-import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,7 +30,7 @@ public class ExchangeService implements Service {
     public Exchange exchange(Exchange dto) {
         try {
             EntityExchangeRate entityExchangeRate = findExchangeRate(dto)
-                    .orElseThrow(() -> new CENotFoundException(String.format(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND,
+                    .orElseThrow(() -> new CENotFoundException(String.format(ExceptionMessage.EXCHANGE_RATE_NOT_FOUND,
                             dto.getBaseCurrency().getCode(), dto.getTargetCurrency().getCode())));
 
             ExchangeRate exchangeRate = converter.toDto(entityExchangeRate);
@@ -44,9 +44,9 @@ public class ExchangeService implements Service {
                     .convertedAmount(exchange(amount, entityExchangeRate.getRate()))
                     .build();
         } catch (CENotFoundException e) {
-            throw new CENotFoundException(ExceptionMessages.EXCHANGE_FAILED, e.getMessage());
+            throw new CENotFoundException(String.format(ExceptionMessage.EXCHANGE_FAILED, e.getMessage()));
         } catch (CEDatabaseException e) {
-            throw new CEDatabaseException(ExceptionMessages.EXCHANGE_FAILED, e.getMessage());
+            throw new CEDatabaseException(String.format(ExceptionMessage.EXCHANGE_FAILED, e.getMessage()));
         }
     }
 

@@ -13,6 +13,11 @@ import java.util.Optional;
 
 public abstract class BaseJdbcDao<E extends Entity> {
 
+    protected static final String SAVE_OPERATION = "save";
+    protected static final String READ_OPERATION = "read";
+    protected static final String READ_ALL_OPERATION = "read all";
+    protected static final String UPDATE_OPERATION = "update";
+
     protected E save(String query, Object... params) {
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -22,13 +27,13 @@ public abstract class BaseJdbcDao<E extends Entity> {
             if (resultSet.next()) {
                 return extractEntity(resultSet);
             } else {
-                throw createExceptionForEmptyResultSet("save", params);
+                throw createExceptionForEmptyResultSet(SAVE_OPERATION, params);
             }
         } catch (SQLException e) {
             if (e.getSQLState().startsWith("23")) {
                 throw createAlreadyExistsException(params);
             }
-            throw createDatabaseException("save", params);
+            throw createDatabaseException(SAVE_OPERATION, params);
         }
     }
 
@@ -38,7 +43,7 @@ public abstract class BaseJdbcDao<E extends Entity> {
              ResultSet resultSet = preparedStatement.executeQuery()) {
             return extractEntities(resultSet);
         } catch (SQLException e) {
-            throw createDatabaseException("read all");
+            throw createDatabaseException(READ_ALL_OPERATION);
         }
     }
 
@@ -61,7 +66,7 @@ public abstract class BaseJdbcDao<E extends Entity> {
                 return Optional.of(extractEntity(resultSet));
             }
         } catch (SQLException e) {
-            throw createDatabaseException("read", baseCurrencyCode, targetCurrencyCode);
+            throw createDatabaseException(READ_OPERATION, baseCurrencyCode, targetCurrencyCode);
         }
 
         return Optional.empty();
