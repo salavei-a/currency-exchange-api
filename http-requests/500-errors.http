@@ -1,3 +1,5 @@
+# Shut down the database before sending requests
+
 ### Get all currencies - 500 Internal Server Error
 GET http://localhost:8080/currencies
 Accept: application/json

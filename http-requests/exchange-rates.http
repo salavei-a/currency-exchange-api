@@ -1,50 +1,3 @@
-### Get all currencies - 200 OK
-GET http://localhost:8080/currencies
-Accept: application/json
-
-### Create currency - 201 Created
-POST http://localhost:8080/currencies
-Accept: application/json
-Content-Type: application/x-www-form-urlencoded
-
-name=Pound Sterling &
-code=GBP &
-sign=£
-
-### Create currency - 400 Bad Request
-### Invalid or missing input data
-POST http://localhost:8080/currencies
-Accept: application/json
-Content-Type: application/x-www-form-urlencoded
-
-name= &
-code=GBP &
-sign=£
-
-### Create currency - 409 Conflict
-### Currency already exists in the database
-POST http://localhost:8080/currencies
-Accept: application/json
-Content-Type: application/x-www-form-urlencoded
-
-name=Pound Sterling &
-code=GBP &
-sign=£
-
-### Get currency by code - 200 OK
-GET http://localhost:8080/currency/EUR
-Accept: application/json
-
-### Get currency by code - 400 Bad Request
-### Invalid or missing input data
-GET http://localhost:8080/currency/
-Accept: application/json
-
-### Get currency by code - 404 Not Found
-### Currency not found in the database
-GET http://localhost:8080/currency/CHF
-Accept: application/json
-
 ### Get all exchange rate - 200 OK
 GET http://localhost:8080/exchangeRates
 Accept: application/json
@@ -124,17 +77,3 @@ Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
 rate=91.496732
-
-### Exchange - 200 OK
-GET http://localhost:8080/exchange?from=USD&to=RUB&amount=100
-Accept: application/json
-
-### Exchange - 400 Bad Request
-### Invalid or missing input data
-GET http://localhost:8080/exchange?from=UST&to=RUB&amount=100
-Accept: application/json
-
-### Exchange - 404 Not Found
-#### Exchange operation failed. Currency not found in the database
-GET http://localhost:8080/exchange?from=CAD&to=RUB&amount=100
-Accept: application/json
