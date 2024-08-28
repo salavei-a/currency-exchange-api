@@ -52,6 +52,13 @@ public abstract class BaseServlet<
         this.service = service;
     }
 
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS");
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
     protected <T> void writeJsonResponse(HttpServletResponse response, int statusCode, T responseObject) {
         response.setStatus(statusCode);
 
