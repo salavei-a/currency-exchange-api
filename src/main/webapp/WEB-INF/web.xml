@@ -65,6 +65,10 @@
     </filter>
     <filter-mapping>
         <filter-name>EncodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/currency/*</url-pattern>
+        <url-pattern>/currencies</url-pattern>
+        <url-pattern>/exchangeRate/*</url-pattern>
+        <url-pattern>/exchangeRates</url-pattern>
+        <url-pattern>/exchange/*</url-pattern>
     </filter-mapping>
 </web-app>
