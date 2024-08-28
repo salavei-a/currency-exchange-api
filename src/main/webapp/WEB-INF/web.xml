@@ -71,4 +71,7 @@
         <url-pattern>/exchangeRates</url-pattern>
         <url-pattern>/exchange/*</url-pattern>
     </filter-mapping>
+    <listener>
+        <listener-class>com.asalavei.currencyexchange.api.FlywayContextListener</listener-class>
+    </listener>
 </web-app>

@@ -12,15 +12,6 @@ services:
     ports:
       - "4679:5432"
 
-  flyway:
-    container_name: currency-exchange-flyway
-    image: flyway/flyway:10-alpine
-    command: -url=jdbc:postgresql://postgres/currency_exchange -schemas=public -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} -connectRetries=60 migrate
-    depends_on:
-      - postgres
-    volumes:
-      - ./src/main/resources/db/migration:/flyway/sql
-
   nginx:
     container_name: currency-exchange-frontend-nginx
     image: nginx:1-alpine

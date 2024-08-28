@@ -1,6 +1,7 @@
 package com.asalavei.currencyexchange.api.dbaccess;
 
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
@@ -19,12 +20,21 @@ public class ConnectionManager {
     private ConnectionManager() {
     }
 
+    public static HikariDataSource getHikariDataSource() {
+        try {
+            initDataSource();
+            return hikariDataSource;
+        } catch (HikariPool.PoolInitializationException e) {
+            throw new CEDatabaseException(ExceptionMessage.DATABASE_UNAVAILABLE, e);
+        }
+    }
+
     public static Connection getConnection() {
         try {
             initDataSource();
             return hikariDataSource.getConnection();
         } catch (HikariPool.PoolInitializationException | SQLException e) {
-            throw new CEDatabaseException("Database unavailable", e);
+            throw new CEDatabaseException(ExceptionMessage.DATABASE_UNAVAILABLE, e);
         }
     }
 

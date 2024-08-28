@@ -15,13 +15,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public abstract class BaseServlet<
@@ -30,7 +30,7 @@ public abstract class BaseServlet<
         C extends JsonDtoConverter<J, D>,
         S extends Service> extends HttpServlet {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseServlet.class);
+    private static final Logger logger = Logger.getLogger(BaseServlet.class.getName());
 
     protected final C converter;
     protected final S service;
@@ -65,7 +65,7 @@ public abstract class BaseServlet<
         try {
             objectMapper.writeValue(response.getWriter(), responseObject);
         } catch (IOException e) {
-            logger.error(ExceptionMessage.ERROR_WRITING_RESPONSE, statusCode, e);
+            logger.log(Level.SEVERE, String.format(ExceptionMessage.ERROR_WRITING_RESPONSE, statusCode), e);
 
             throw new CERuntimeException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
