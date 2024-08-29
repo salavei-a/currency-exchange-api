@@ -26,7 +26,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    restart: on-failure
+    restart: always
     ports:
       - "8181:8080"
 
@@ -34,6 +34,6 @@ services:
     container_name: currency-exchange-frontend-nginx
     image: nginx:1-alpine
     ports:
-      - 3030:80
+      - 80:80
     volumes:
       - ./frontend/:/usr/share/nginx/html
