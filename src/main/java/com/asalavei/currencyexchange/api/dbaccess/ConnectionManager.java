@@ -13,9 +13,9 @@ public class ConnectionManager {
 
     private static HikariDataSource hikariDataSource;
 
-    private static final String URL = "jdbc:postgresql://localhost:4679/currency_exchange";
-    private static final String USER = System.getenv("POSTGRES_USER") != null ? System.getenv("POSTGRES_USER") : "admin";
-    private static final String PASSWORD = System.getenv("POSTGRES_PASSWORD") != null ? System.getenv("POSTGRES_PASSWORD") : "admin";
+    private static final String URL = System.getenv("POSTGRES_URL");
+    private static final String USER = System.getenv("POSTGRES_USER");
+    private static final String PASSWORD = System.getenv("POSTGRES_PASSWORD");
 
     private ConnectionManager() {
     }
