@@ -1,7 +1,6 @@
-version: "3.9"
-
 services:
   db:
+    container_name: currency-exchange-db
     image: postgres:14-alpine
     restart: always
     healthcheck:
@@ -29,4 +28,14 @@ services:
         condition: service_healthy
     restart: on-failure
     ports:
-      - "8080:8080"
+      - "8888:8080"
+
+  frontend:
+    container_name: currency-exchange-frontend-nginx
+    image: nginx:1-alpine
+    environment:
+      API_URL: api:8080
+    ports:
+      - 3333:80
+    volumes:
+      - ./frontend/:/usr/share/nginx/html

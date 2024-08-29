@@ -69,4 +69,11 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
 
         writeJsonResponse(response, HttpServletResponse.SC_OK, jsonExchangeRate);
     }
+
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS");
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
 }
