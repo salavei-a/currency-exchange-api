@@ -2,7 +2,6 @@ package com.asalavei.currencyexchange.api;
 
 import com.asalavei.currencyexchange.api.dbaccess.ConnectionManager;
 import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
-import com.asalavei.currencyexchange.api.exceptions.CERuntimeException;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import org.flywaydb.core.Flyway;
@@ -28,7 +27,6 @@ public class FlywayContextListener implements ServletContextListener {
             logger.info("Flyway migration completed successfully");
         } catch (FlywayException | CEDatabaseException e) {
             logger.log(Level.SEVERE, ERROR_FLYWAY, e);
-            throw new CERuntimeException(ERROR_FLYWAY);
         }
     }
 }
