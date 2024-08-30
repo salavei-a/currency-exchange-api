@@ -12,6 +12,5 @@ CREATE TABLE IF NOT EXISTS exchange_rates (
     rate               DECIMAL(16, 6) NOT NULL,
     FOREIGN KEY (base_currency_id)   REFERENCES currencies(id),
     FOREIGN KEY (target_currency_id) REFERENCES currencies(id),
-    CONSTRAINT exchange_rates_unique_currency_ids UNIQUE (base_currency_id, target_currency_id),
-    CONSTRAINT check_different_currency_ids       CHECK (base_currency_id <> target_currency_id)
+    CONSTRAINT exchange_rates_unique_currency_ids UNIQUE (base_currency_id, target_currency_id)
 );

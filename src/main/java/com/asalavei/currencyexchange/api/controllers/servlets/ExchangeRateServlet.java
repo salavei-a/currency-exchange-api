@@ -37,8 +37,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         String baseCurrencyCode = pathInfo.substring(1, 4);
         String targetCurrencyCode = pathInfo.substring(4, 7);
 
-        validateCurrencyCode(baseCurrencyCode);
-        validateCurrencyCode(targetCurrencyCode);
+        validateCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
 
         ExchangeRate exchangeRate = service.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
         JsonExchangeRate jsonExchangeRate = converter.toJsonDto(exchangeRate);

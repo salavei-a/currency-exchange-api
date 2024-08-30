@@ -59,7 +59,6 @@ public abstract class BaseServlet<
             objectMapper.writeValue(response.getWriter(), responseObject);
         } catch (IOException e) {
             logger.log(Level.SEVERE, String.format(ExceptionMessage.ERROR_WRITING_RESPONSE, statusCode), e);
-
             throw new CERuntimeException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
     }
@@ -108,8 +107,16 @@ public abstract class BaseServlet<
             throw new CEInvalidInputData(String.format(ExceptionMessage.INPUT_DATA_INVALID, param + " must be a positive number"));
         }
 
+        validateCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
+    }
+
+    protected void validateCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode) {
         validateCurrencyCode(baseCurrencyCode);
         validateCurrencyCode(targetCurrencyCode);
+
+        if (baseCurrencyCode.equals(targetCurrencyCode)) {
+            throw new CEInvalidInputData(String.format(ExceptionMessage.INPUT_DATA_INVALID, "base and target currencies are the same"));
+        }
     }
 
     protected void validateCurrencyCode(String code) {
