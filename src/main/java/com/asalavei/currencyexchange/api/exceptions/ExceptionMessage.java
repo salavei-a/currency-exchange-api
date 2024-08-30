@@ -10,8 +10,7 @@ public class ExceptionMessage {
     public static final String INPUT_DATA_INVALID_OR_MISSING = "Required input data is invalid or missing: %s";
 
     public static final String ERROR_WRITING_RESPONSE = "Error writing response for status code: %s";
-    public static final String ERROR_PROCESSING_REQUEST = "An error occurred while processing the request";
-    public static final String ERROR_PROCESSING_REQUEST_TO_DATABASE = ERROR_PROCESSING_REQUEST + " to the database";
+    public static final String ERROR_PROCESSING_REQUEST_TO_DATABASE = "An error occurred while processing the request to the database";
     public static final String DATABASE_UNAVAILABLE = "Database unavailable";
 
     public static final String CURRENCY_NOT_FOUND = "Currency with code %s not found";

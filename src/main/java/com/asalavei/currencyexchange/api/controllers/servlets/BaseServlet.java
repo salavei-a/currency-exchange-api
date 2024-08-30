@@ -2,7 +2,6 @@ package com.asalavei.currencyexchange.api.controllers.servlets;
 
 import com.asalavei.currencyexchange.api.dto.Dto;
 import com.asalavei.currencyexchange.api.exceptions.CEInvalidInputData;
-import com.asalavei.currencyexchange.api.exceptions.CERuntimeException;
 import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 import com.asalavei.currencyexchange.api.json.JsonCurrency;
 import com.asalavei.currencyexchange.api.json.JsonDto;
@@ -59,7 +58,6 @@ public abstract class BaseServlet<
             objectMapper.writeValue(response.getWriter(), responseObject);
         } catch (IOException e) {
             logger.log(Level.SEVERE, String.format(ExceptionMessage.ERROR_WRITING_RESPONSE, statusCode), e);
-            throw new CERuntimeException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
     }
 

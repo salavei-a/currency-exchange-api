@@ -43,7 +43,6 @@ public class ExceptionHandlerFilter extends HttpFilter {
             objectMapper.writeValue(response.getWriter(), new JsonMessage(e.getMessage()));
         } catch (IOException ex) {
             logger.log(Level.SEVERE, String.format(ExceptionMessage.ERROR_WRITING_RESPONSE, statusCode), ex);
-            throw new CERuntimeException(ExceptionMessage.ERROR_PROCESSING_REQUEST);
         }
     }
 }
