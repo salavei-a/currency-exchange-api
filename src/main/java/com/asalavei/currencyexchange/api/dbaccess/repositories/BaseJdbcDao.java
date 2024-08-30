@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-public abstract class BaseJdbcDao<E extends Entity> {
+public abstract class BaseJdbcDao<E extends Entity> implements Repository<E> {
 
     protected static final String SAVE_OPERATION = "save";
     protected static final String READ_OPERATION = "read";
