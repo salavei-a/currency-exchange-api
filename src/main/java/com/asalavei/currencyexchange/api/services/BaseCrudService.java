@@ -7,6 +7,14 @@ import com.asalavei.currencyexchange.api.dto.Dto;
 
 import java.util.Collection;
 
+/**
+ * Base CRUD Service
+ *
+ * @param <D> the type of {@link Dto}
+ * @param <E> the type of {@link Entity}
+ * @param <C> the type of {@link EntityDtoConverter}
+ * @param <R> the type of {@link Repository}
+ */
 public abstract class BaseCrudService<
         D extends Dto,
         E extends Entity,

@@ -15,6 +15,9 @@ import java.util.Optional;
 
 import static java.math.MathContext.DECIMAL64;
 
+/**
+ * Service for handling currency exchange operations
+ */
 public class ExchangeService implements Service {
 
     private final ExchangeRateRepository exchangeRateRepository;

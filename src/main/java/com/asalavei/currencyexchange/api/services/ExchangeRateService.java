@@ -7,6 +7,9 @@ import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 
+/**
+ * Service for managing exchange rate data
+ */
 public class ExchangeRateService extends BaseCrudService<ExchangeRate, EntityExchangeRate, EntityExchangeRateConverter, ExchangeRateRepository> {
 
     public ExchangeRateService(EntityExchangeRateConverter converter, ExchangeRateRepository repository) {

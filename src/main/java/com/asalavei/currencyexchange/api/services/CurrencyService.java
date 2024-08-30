@@ -7,6 +7,9 @@ import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
 import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 
+/**
+ * Service for managing currency data
+ */
 public class CurrencyService extends BaseCrudService<Currency, EntityCurrency, EntityCurrencyConverter, CurrencyRepository> {
 
     public CurrencyService(EntityCurrencyConverter converter, CurrencyRepository repository) {
