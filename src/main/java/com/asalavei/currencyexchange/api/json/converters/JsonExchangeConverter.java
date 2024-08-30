@@ -4,12 +4,20 @@ import com.asalavei.currencyexchange.api.dto.Exchange;
 import com.asalavei.currencyexchange.api.json.JsonExchange;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
+/**
+ * Converter for converting between {@link JsonExchange} and {@link Exchange}
+ */
 public class JsonExchangeConverter implements JsonDtoConverter<JsonExchange, Exchange> {
 
     private final JsonCurrencyConverter converter = new JsonCurrencyConverter();
 
+    /**
+     * Converts the {@link JsonExchange jsonDto} to the {@link Exchange}
+     *
+     * @param jsonDto incoming the {@link JsonExchange} to be converted
+     * @return the converted {@link Exchange}
+     */
     @Override
     public Exchange toDto(JsonExchange jsonDto) {
         return Exchange.builder()
@@ -21,6 +29,12 @@ public class JsonExchangeConverter implements JsonDtoConverter<JsonExchange, Exc
                 .build();
     }
 
+    /**
+     * Converts the {@link Exchange dto} to the {@link JsonExchange}
+     *
+     * @param dto incoming the {@link Exchange} to be converted
+     * @return the converted {@link JsonExchange}
+     */
     public JsonExchange toJsonDto(Exchange dto) {
         return JsonExchange.builder()
                 .baseCurrency(converter.toJsonDto(dto.getBaseCurrency()))
@@ -31,8 +45,16 @@ public class JsonExchangeConverter implements JsonDtoConverter<JsonExchange, Exc
                 .build();
     }
 
+    /**
+     * Converts the collection of the {@link Exchange dtoCollection} to the collection of the {@link JsonExchange}
+     *
+     * @param dtoCollection the collection of the {@link Exchange} to be converted
+     * @return the converted collection of the {@link JsonExchange}
+     */
     @Override
     public Collection<JsonExchange> toJsonDto(Collection<Exchange> dtoCollection) {
-        return dtoCollection.stream().map(this::toJsonDto).collect(Collectors.toList());
+        return dtoCollection.stream()
+                .map(this::toJsonDto)
+                .toList();
     }
 }
