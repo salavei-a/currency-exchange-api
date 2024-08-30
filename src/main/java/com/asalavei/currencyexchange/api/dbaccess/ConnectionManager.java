@@ -13,10 +13,6 @@ public class ConnectionManager {
 
     private static HikariDataSource hikariDataSource;
 
-    private static final String URL = System.getenv("POSTGRES_URL");
-    private static final String USER = System.getenv("POSTGRES_USER");
-    private static final String PASSWORD = System.getenv("POSTGRES_PASSWORD");
-
     private ConnectionManager() {
     }
 
@@ -42,10 +38,10 @@ public class ConnectionManager {
         if (hikariDataSource == null) {
             HikariConfig config = new HikariConfig();
 
-            config.setJdbcUrl(URL);
-            config.setUsername(USER);
-            config.setPassword(PASSWORD);
-            config.setDriverClassName("org.postgresql.Driver");
+            config.setJdbcUrl(DatabaseConfig.URL);
+            config.setUsername(DatabaseConfig.USER);
+            config.setPassword(DatabaseConfig.PASSWORD);
+            config.setDriverClassName(DatabaseConfig.DRIVER_CLASS_NAME);
             config.setMaximumPoolSize(10);
 
             hikariDataSource = new HikariDataSource(config);
