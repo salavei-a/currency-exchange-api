@@ -11,6 +11,9 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Manages the HikariCP connection pool and provides methods to obtain database connections
+ */
 public class ConnectionManager {
 
     private static final Logger logger = Logger.getLogger(ConnectionManager.class.getName());
@@ -20,11 +23,21 @@ public class ConnectionManager {
     private ConnectionManager() {
     }
 
+    /**
+     * Returns the {@link HikariDataSource} instance, initializing it if necessary
+     *
+     * @return the {@link HikariDataSource} instance
+     */
     public static HikariDataSource getHikariDataSource() {
         initDataSource();
         return hikariDataSource;
     }
 
+    /**
+     * Obtain a database connection from the {@link HikariDataSource} connection pool
+     *
+     * @return a {@link Connection} object
+     */
     public static Connection getConnection() {
         try {
             initDataSource();
