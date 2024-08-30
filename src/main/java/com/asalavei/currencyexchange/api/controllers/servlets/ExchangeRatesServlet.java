@@ -10,6 +10,9 @@ import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet for handling GET and POST requests to get all exchange rates and create an exchange rate in the database
+ */
 public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
     public ExchangeRatesServlet() {

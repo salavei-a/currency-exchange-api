@@ -10,6 +10,9 @@ import com.asalavei.currencyexchange.api.services.ExchangeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet for handling GET requests to get the amount after currency exchange
+ */
 public class ExchangeServlet extends BaseServlet<JsonExchange, Exchange, JsonExchangeConverter, ExchangeService> {
 
     public ExchangeServlet() {

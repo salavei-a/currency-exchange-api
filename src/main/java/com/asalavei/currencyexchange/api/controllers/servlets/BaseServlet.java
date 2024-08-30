@@ -23,6 +23,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Base servlet for handling HTTP requests and responses
+ *
+ * @param <J> the type of {@link JsonDto}
+ * @param <D> the type of {@link Dto}
+ * @param <C> the type of {@link JsonDtoConverter}
+ * @param <S> the type of {@link Service}
+ */
 public abstract class BaseServlet<
         J extends JsonDto,
         D extends Dto,

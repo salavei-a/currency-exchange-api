@@ -9,6 +9,9 @@ import com.asalavei.currencyexchange.api.services.CurrencyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Servlet for handling GET requests to get a currency from the database
+ */
 public class CurrencyServlet extends BaseServlet<JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
     public CurrencyServlet() {
