@@ -15,6 +15,21 @@ services:
     ports:
       - "4679:5432"
 
+  api:
+    container_name: currency-exchange-api
+    image: asalavei/currency-exchange-tomcat:latest
+    environment:
+      POSTGRES_URL: jdbc:postgresql://db/currency_exchange
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+    ports:
+      - "8181:8080"
+
   frontend:
     container_name: currency-exchange-frontend-nginx
     image: nginx:1-alpine

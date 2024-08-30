@@ -1,6 +1,10 @@
 $(document).ready(function() {
     // const host = "http://server-ip:8888/api"
-      const host = "http://localhost:8181/api"
+
+    // local deployment using docker-compose.prod.yml
+    // const host = "http://localhost:8181/api"
+
+    const host = "http://localhost:8080/api"
 
     // Fetch the list of currencies and populate the select element
     function requestCurrencies() {
