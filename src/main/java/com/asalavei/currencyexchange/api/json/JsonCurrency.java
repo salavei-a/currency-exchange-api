@@ -1,9 +1,10 @@
 package com.asalavei.currencyexchange.api.json;
 
 /**
- * DTO representing currency data that can be serialized to and deserialized from JSON
+ * JSON DTO for currency data
  */
 public class JsonCurrency extends BaseJsonDto<Integer> {
+
     private String name;
     private String code;
     private String sign;
@@ -45,6 +46,7 @@ public class JsonCurrency extends BaseJsonDto<Integer> {
      * Builder for creating instances of the {@link JsonCurrency}
      */
     public static final class Builder {
+
         private Integer id;
         private String name;
         private String code;

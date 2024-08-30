@@ -1,8 +1,11 @@
 package com.asalavei.currencyexchange.api.json;
 
-public class JsonMessage {
+/**
+ * JSON DTO for message data
+ */
+public class JsonMessage implements JsonDto {
 
-    private String message;
+    private final String message;
 
     public JsonMessage(String message) {
         this.message = message;
