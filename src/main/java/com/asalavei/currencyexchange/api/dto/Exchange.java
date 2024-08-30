@@ -41,10 +41,18 @@ public class Exchange implements Dto {
         return convertedAmount;
     }
 
+    /**
+     * Creates a new {@link Builder} instance for constructing {@link Exchange} instances
+     *
+     * @return a new Builder instance
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Builder for creating instances of the {@link Exchange}
+     */
     public static final class Builder {
 
         private Currency baseCurrency;
