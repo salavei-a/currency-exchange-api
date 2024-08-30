@@ -10,12 +10,20 @@ import org.flywaydb.core.api.FlywayException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * ServletContextListener that triggers Flyway migrations when the application starts
+ */
 public class FlywayContextListener implements ServletContextListener {
 
     private static final Logger logger = Logger.getLogger(FlywayContextListener.class.getName());
 
     public static final String ERROR_FLYWAY = "Failed to execute Flyway migration";
 
+    /**
+     * Initializes the Flyway migration process when the servlet context is initialized
+     *
+     * @param sce the ServletContextEvent containing the servlet context
+     */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
