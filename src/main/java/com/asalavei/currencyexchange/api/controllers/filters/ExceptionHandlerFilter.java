@@ -15,6 +15,9 @@ import java.util.logging.Logger;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
 
+/**
+ * Filter that catches exceptions during request processing and sends the correct HTTP responses
+ */
 public class ExceptionHandlerFilter extends HttpFilter {
 
     private static final Logger logger = Logger.getLogger(ExceptionHandlerFilter.class.getName());

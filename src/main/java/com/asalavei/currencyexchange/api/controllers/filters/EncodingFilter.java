@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Encoding Filter
+ */
 public class EncodingFilter extends HttpFilter {
 
     @Override

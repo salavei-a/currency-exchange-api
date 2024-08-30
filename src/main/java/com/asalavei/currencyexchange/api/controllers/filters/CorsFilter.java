@@ -8,6 +8,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Filter that handles Cross-Origin Resource Sharing (CORS) settings
+ */
 public class CorsFilter extends HttpFilter {
 
     @Override
