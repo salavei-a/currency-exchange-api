@@ -64,31 +64,22 @@ public class ExchangeService implements Service {
         return exchangeRateRepository.findByCurrencyCodes(dto.getBaseCurrency().getCode(), dto.getTargetCurrency().getCode());
     }
 
-
     private Optional<EntityExchangeRate> findByReverseRate(Exchange dto) {
-        Optional<EntityExchangeRate> entityExchangeRateOptional = exchangeRateRepository.findByCurrencyCodes(
-                dto.getTargetCurrency().getCode(), dto.getBaseCurrency().getCode());
-
-        if (entityExchangeRateOptional.isEmpty()) {
-            return Optional.empty();
-        }
-
-        EntityExchangeRate entityExchangeRate = entityExchangeRateOptional.get();
-
-        return Optional.of(EntityExchangeRate.builder()
-                .baseCurrency(entityExchangeRate.getTargetCurrency())
-                .targetCurrency(entityExchangeRate.getBaseCurrency())
-                .rate(BigDecimal.ONE.divide(entityExchangeRate.getRate(), DECIMAL64).setScale(6, RoundingMode.HALF_EVEN))
-                .build());
+        return exchangeRateRepository.findByCurrencyCodes(dto.getTargetCurrency().getCode(), dto.getBaseCurrency().getCode())
+                .map(reverseRate -> EntityExchangeRate.builder()
+                                     .baseCurrency(reverseRate.getTargetCurrency())
+                                     .targetCurrency(reverseRate.getBaseCurrency())
+                                     .rate(BigDecimal.ONE.divide(reverseRate.getRate(), DECIMAL64).setScale(6, RoundingMode.HALF_EVEN))
+                                     .build());
     }
 
     private Optional<EntityExchangeRate> findByCrossCurrency(Exchange dto) {
         return exchangeRateRepository.findByCurrencyCodes(crossCurrencyCode, dto.getBaseCurrency().getCode())
                 .flatMap(crossToBase -> exchangeRateRepository.findByCurrencyCodes(crossCurrencyCode, dto.getTargetCurrency().getCode())
-                        .map(crossToTarget -> EntityExchangeRate.builder()
-                                .baseCurrency(crossToBase.getTargetCurrency())
-                                .targetCurrency(crossToTarget.getTargetCurrency())
-                                .rate(crossToTarget.getRate().divide(crossToBase.getRate(), DECIMAL64).setScale(6, RoundingMode.HALF_EVEN))
-                                .build()));
+                .map(crossToTarget -> EntityExchangeRate.builder()
+                                       .baseCurrency(crossToBase.getTargetCurrency())
+                                       .targetCurrency(crossToTarget.getTargetCurrency())
+                                       .rate(crossToTarget.getRate().divide(crossToBase.getRate(), DECIMAL64).setScale(6, RoundingMode.HALF_EVEN))
+                                       .build()));
     }
 }
