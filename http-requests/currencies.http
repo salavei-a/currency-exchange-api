@@ -1,9 +1,9 @@
 ### Get all currencies - 200 OK
-GET http://localhost:8080/currencies
+GET http://localhost:8080/api/currencies
 Accept: application/json
 
 ### Create currency - 201 Created
-POST http://localhost:8080/currencies
+POST http://localhost:8080/api/currencies
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -13,7 +13,7 @@ sign=£
 
 ### Create currency - 400 Bad Request
 ### Invalid or missing input data
-POST http://localhost:8080/currencies
+POST http://localhost:8080/api/currencies
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -23,7 +23,7 @@ sign=£
 
 ### Create currency - 409 Conflict
 ### Currency already exists in the database
-POST http://localhost:8080/currencies
+POST http://localhost:8080/api/currencies
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -32,15 +32,15 @@ code=GBP &
 sign=£
 
 ### Get currency by code - 200 OK
-GET http://localhost:8080/currency/EUR
+GET http://localhost:8080/api/currency/EUR
 Accept: application/json
 
 ### Get currency by code - 400 Bad Request
 ### Invalid or missing input data
-GET http://localhost:8080/currency/
+GET http://localhost:8080/api/currency/
 Accept: application/json
 
 ### Get currency by code - 404 Not Found
 ### Currency not found in the database
-GET http://localhost:8080/currency/CHF
+GET http://localhost:8080/api/currency/CHF
 Accept: application/json

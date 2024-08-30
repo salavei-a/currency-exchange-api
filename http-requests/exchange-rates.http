@@ -1,23 +1,28 @@
 ### Get all exchange rate - 200 OK
-GET http://localhost:8080/exchangeRates
+GET http://localhost:8080/api/exchangeRates
 Accept: application/json
 
 ### Get exchange rate by currency codes - 200 OK
-GET http://localhost:8080/exchangeRate/USDGEL
+GET http://localhost:8080/api/exchangeRate/USDGEL
 Accept: application/json
 
 ### Get exchange rate by currency codes - 400 Bad Request
 ### Invalid or missing input data
-GET http://localhost:8080/exchangeRate/USD
+GET http://localhost:8080/api/exchangeRate/USD
+Accept: application/json
+
+### Get exchange rate by currency codes - 400 Bad Request
+### Invalid input data: base and target currencies are the same
+GET http://localhost:8080/api/exchangeRate/EUREUR
 Accept: application/json
 
 ### Get exchange rate by currency codes - 404 Not Found
 ### Exchange rate not found in the database
-GET http://localhost:8080/exchangeRate/GELEUR
+GET http://localhost:8080/api/exchangeRate/GELEUR
 Accept: application/json
 
 ### Create exchange rate - 201 Created
-POST http://localhost:8080/exchangeRates
+POST http://localhost:8080/api/exchangeRates
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -27,7 +32,7 @@ rate=1.212499
 
 ### Create exchange rate - 400 Bad Request
 ### Invalid or missing input data
-POST http://localhost:8080/exchangeRates
+POST http://localhost:8080/api/exchangeRates
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -37,7 +42,7 @@ rate=1.212499
 
 ### Create exchange rate - 409 Conflict
 #### Exchange rate already exists in the database
-POST http://localhost:8080/exchangeRates
+POST http://localhost:8080/api/exchangeRates
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -47,7 +52,7 @@ rate=1.212499
 
 ### Create exchange rate - 404 Not Found
 #### Currency required to save the exchange rate not found
-POST http://localhost:8080/exchangeRates
+POST http://localhost:8080/api/exchangeRates
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -56,7 +61,7 @@ targetCurrencyCode=BYN &
 rate=1.212499
 
 ### Update exchange rate - 200 OK
-PATCH http://localhost:8080/exchangeRate/USDRUB
+PATCH http://localhost:8080/api/exchangeRate/USDRUB
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -64,7 +69,7 @@ rate=91.496732
 
 ### Update exchange rate - 400 Bad Request
 ### Invalid or missing input data
-PATCH http://localhost:8080/exchangeRate/USDRU
+PATCH http://localhost:8080/api/exchangeRate/USDRU
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
@@ -72,7 +77,7 @@ rate=1
 
 ### Update exchange rate - 404 Not Found
 ### Exchange rate not found in the database
-PATCH http://localhost:8080/exchangeRate/BYNRUB
+PATCH http://localhost:8080/api/exchangeRate/BYNRUB
 Accept: application/json
 Content-Type: application/x-www-form-urlencoded
 
