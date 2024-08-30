@@ -9,8 +9,6 @@ import com.asalavei.currencyexchange.api.services.CurrencyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.Collection;
-
 public class CurrenciesServlet extends BaseServlet<JsonCurrency, Currency, JsonCurrencyConverter, CurrencyService> {
 
     public CurrenciesServlet() {
@@ -19,8 +17,7 @@ public class CurrenciesServlet extends BaseServlet<JsonCurrency, Currency, JsonC
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        Collection<JsonCurrency> jsonCurrencies = converter.toJsonDto(service.findAll());
-        writeJsonResponse(response, HttpServletResponse.SC_OK, jsonCurrencies);
+        writeJsonResponse(response, HttpServletResponse.SC_OK, converter.toJsonDto(service.findAll()));
     }
 
     @Override
@@ -34,8 +31,7 @@ public class CurrenciesServlet extends BaseServlet<JsonCurrency, Currency, JsonC
         validate(requestJsonCurrency);
 
         Currency currency = service.create(converter.toDto(requestJsonCurrency));
-        JsonCurrency responseJsonCurrency = converter.toJsonDto(currency);
 
-        writeJsonResponse(response, HttpServletResponse.SC_CREATED, responseJsonCurrency);
+        writeJsonResponse(response, HttpServletResponse.SC_CREATED, converter.toJsonDto(currency));
     }
 }

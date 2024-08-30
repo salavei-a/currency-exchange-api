@@ -10,8 +10,6 @@ import com.asalavei.currencyexchange.api.services.ExchangeRateService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.Collection;
-
 public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, ExchangeRate, JsonExchangeRateConverter, ExchangeRateService> {
 
     public ExchangeRatesServlet() {
@@ -20,8 +18,7 @@ public class ExchangeRatesServlet extends BaseServlet<JsonExchangeRate, Exchange
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        Collection<JsonExchangeRate> jsonExchangeRates = converter.toJsonDto(service.findAll());
-        writeJsonResponse(response, HttpServletResponse.SC_OK, jsonExchangeRates);
+        writeJsonResponse(response, HttpServletResponse.SC_OK, converter.toJsonDto(service.findAll()));
     }
 
     @Override

@@ -40,9 +40,8 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         validateCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
 
         ExchangeRate exchangeRate = service.findByCurrencyCodes(baseCurrencyCode, targetCurrencyCode);
-        JsonExchangeRate jsonExchangeRate = converter.toJsonDto(exchangeRate);
 
-        writeJsonResponse(response, HttpServletResponse.SC_OK, jsonExchangeRate);
+        writeJsonResponse(response, HttpServletResponse.SC_OK, converter.toJsonDto(exchangeRate));
     }
 
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) {
@@ -64,8 +63,7 @@ public class ExchangeRateServlet extends BaseServlet<JsonExchangeRate, ExchangeR
         validate(requestJsonExchange, RATE_PARAM);
 
         ExchangeRate dtoExchangeRate = service.update(converter.toDto(requestJsonExchange));
-        JsonExchangeRate jsonExchangeRate = converter.toJsonDto(dtoExchangeRate);
 
-        writeJsonResponse(response, HttpServletResponse.SC_OK, jsonExchangeRate);
+        writeJsonResponse(response, HttpServletResponse.SC_OK, converter.toJsonDto(dtoExchangeRate));
     }
 }
