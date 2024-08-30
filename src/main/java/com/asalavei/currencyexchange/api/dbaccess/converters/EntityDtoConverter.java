@@ -5,6 +5,9 @@ import com.asalavei.currencyexchange.api.dto.Dto;
 
 import java.util.Collection;
 
+/**
+ * Converter for converting between {@link Entity} and {@link Dto}
+ */
 public interface EntityDtoConverter<E extends Entity, D extends Dto> {
     E toEntity(D dto);
 

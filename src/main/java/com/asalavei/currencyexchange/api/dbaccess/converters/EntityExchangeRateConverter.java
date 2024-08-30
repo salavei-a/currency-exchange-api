@@ -4,7 +4,6 @@ import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dto.ExchangeRate;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * Converter for converting between {@link EntityExchangeRate} and {@link ExchangeRate}
@@ -16,7 +15,7 @@ public class EntityExchangeRateConverter implements EntityDtoConverter<EntityExc
     /**
      * Converts the {@link ExchangeRate dto} to the {@link EntityExchangeRate}
      *
-     * @param dto incoming the {@link ExchangeRate dto}
+     * @param dto incoming the {@link ExchangeRate} to be converted
      * @return the converted {@link EntityExchangeRate}
      */
     @Override
@@ -32,7 +31,7 @@ public class EntityExchangeRateConverter implements EntityDtoConverter<EntityExc
     /**
      * Converts the {@link EntityExchangeRate entity} to the {@link ExchangeRate}
      *
-     * @param entity incoming the {@link EntityExchangeRate entity}
+     * @param entity incoming the {@link EntityExchangeRate} to be converted
      * @return the converted {@link ExchangeRate}
      */
     @Override
@@ -45,8 +44,16 @@ public class EntityExchangeRateConverter implements EntityDtoConverter<EntityExc
                 .build();
     }
 
+    /**
+     * Converts the collection of the {@link EntityExchangeRate entityCollection} to the collection of the {@link ExchangeRate}
+     *
+     * @param entityCollection the collection of the {@link EntityExchangeRate} to be converted
+     * @return the converted collection of the {@link ExchangeRate}
+     */
     @Override
     public Collection<ExchangeRate> toDto(Collection<EntityExchangeRate> entityCollection) {
-        return entityCollection.stream().map(this::toDto).collect(Collectors.toList());
+        return entityCollection.stream()
+                .map(this::toDto)
+                .toList();
     }
 }

@@ -4,16 +4,16 @@ import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
 import com.asalavei.currencyexchange.api.dto.Currency;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * Converter for converting between {@link EntityCurrency} and {@link Currency}
  */
-public class EntityCurrencyConverter implements EntityDtoConverter<EntityCurrency, Currency>{
+public class EntityCurrencyConverter implements EntityDtoConverter<EntityCurrency, Currency> {
+
     /**
      * Converts the {@link Currency dto} to the {@link EntityCurrency}
      *
-     * @param dto incoming the {@link Currency dto}
+     * @param dto incoming the {@link Currency} to be converted
      * @return the converted {@link EntityCurrency}
      */
     @Override
@@ -29,7 +29,7 @@ public class EntityCurrencyConverter implements EntityDtoConverter<EntityCurrenc
     /**
      * Converts the {@link EntityCurrency entity} to the {@link Currency}
      *
-     * @param entity incoming the {@link EntityCurrency entity}
+     * @param entity incoming the {@link EntityCurrency} to be converted
      * @return the converted {@link Currency}
      */
     @Override
@@ -42,9 +42,16 @@ public class EntityCurrencyConverter implements EntityDtoConverter<EntityCurrenc
                 .build();
     }
 
-
+    /**
+     * Converts the collection of the {@link EntityCurrency entityCollection} to the collection of the {@link Currency}
+     *
+     * @param entityCollection the collection of the {@link EntityCurrency} to be converted
+     * @return the converted collection of the {@link Currency}
+     */
     @Override
     public Collection<Currency> toDto(Collection<EntityCurrency> entityCollection) {
-        return entityCollection.stream().map(this::toDto).collect(Collectors.toList());
+        return entityCollection.stream()
+                .map(this::toDto)
+                .toList();
     }
 }
