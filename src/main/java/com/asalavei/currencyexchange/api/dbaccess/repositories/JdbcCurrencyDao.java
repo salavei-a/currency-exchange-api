@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * JDBC implementation of the {@link CurrencyRepository}
+ */
 public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements CurrencyRepository {
 
     private static final String CURRENCY = "currency with code %s";

@@ -12,6 +12,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * JDBC implementation of the {@link ExchangeRateRepository}
+ */
 public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> implements ExchangeRateRepository {
 
     private static final String EXCHANGE_RATE = "%s/%s exchange rate";

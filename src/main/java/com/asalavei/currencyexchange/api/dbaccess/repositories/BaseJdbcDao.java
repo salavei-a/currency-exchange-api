@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * Base JDBC DAO implementation, provides common methods for database operations
+ *
+ * @param <E> the type of {@link Entity}
+ */
 public abstract class BaseJdbcDao<E extends Entity> implements Repository<E> {
 
     protected static final String SAVE_OPERATION = "save";
