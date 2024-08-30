@@ -2,7 +2,11 @@ package com.asalavei.currencyexchange.api.dto;
 
 import java.math.BigDecimal;
 
+/**
+ * DTO for exchange data
+ */
 public class Exchange implements Dto {
+
     private final Currency baseCurrency;
     private final Currency targetCurrency;
     private final BigDecimal rate;
@@ -42,6 +46,7 @@ public class Exchange implements Dto {
     }
 
     public static final class Builder {
+
         private Currency baseCurrency;
         private Currency targetCurrency;
         private BigDecimal rate;
