@@ -5,7 +5,6 @@ import com.asalavei.currencyexchange.api.exceptions.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -27,16 +26,6 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
     @Override
     public Optional<EntityCurrency> findByCode(String code) {
         return findByCode("SELECT id, full_name, code, sign FROM currencies WHERE code = ?", code);
-    }
-
-    @Override
-    protected Collection<EntityCurrency> extractEntities(ResultSet resultSet) throws SQLException {
-        Collection<EntityCurrency> currencies = new ArrayList<>();
-        while (resultSet.next()) {
-            currencies.add(extractEntity(resultSet));
-        }
-
-        return currencies;
     }
 
     @Override

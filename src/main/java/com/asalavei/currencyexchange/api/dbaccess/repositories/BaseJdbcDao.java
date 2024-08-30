@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -78,13 +79,20 @@ public abstract class BaseJdbcDao<E extends Entity> {
         }
     }
 
-    protected abstract Collection<E> extractEntities(ResultSet resultSet) throws SQLException;
+    protected Collection<E> extractEntities(ResultSet resultSet) throws SQLException {
+        Collection<E> entities = new ArrayList<>();
+        while (resultSet.next()) {
+            entities.add(extractEntity(resultSet));
+        }
+
+        return entities;
+    }
 
     protected abstract E extractEntity(ResultSet resultSet) throws SQLException;
 
-    protected abstract CERuntimeException createExceptionForEmptyResultSet(String operation, Object ... params);
+    protected abstract CERuntimeException createExceptionForEmptyResultSet(String operation, Object... params);
 
-    protected abstract CERuntimeException createAlreadyExistsException(Object ... params);
+    protected abstract CERuntimeException createAlreadyExistsException(Object... params);
 
-    protected abstract CERuntimeException createDatabaseException(String operation, Object ... params);
+    protected abstract CERuntimeException createDatabaseException(String operation, Object... params);
 }

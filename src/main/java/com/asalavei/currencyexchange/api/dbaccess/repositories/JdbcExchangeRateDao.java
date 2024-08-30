@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -93,16 +92,6 @@ public class JdbcExchangeRateDao extends BaseJdbcDao<EntityExchangeRate> impleme
         } catch (SQLException e) {
             throw createDatabaseException("update", baseCurrencyCode, targetCurrencyCode);
         }
-    }
-
-    @Override
-    protected Collection<EntityExchangeRate> extractEntities(ResultSet resultSet) throws SQLException {
-        Collection<EntityExchangeRate> exchangeRates = new ArrayList<>();
-        while (resultSet.next()) {
-            exchangeRates.add(extractEntity(resultSet));
-        }
-
-        return exchangeRates;
     }
 
     @Override
