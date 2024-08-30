@@ -1,5 +1,8 @@
 package com.asalavei.currencyexchange.api.exceptions;
 
+/**
+ * Contains error messages used in the currency exchange API
+ */
 public class ExceptionMessage {
 
     public static final String INPUT_DATA_INVALID = "Required input data is invalid: %s";
