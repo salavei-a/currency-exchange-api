@@ -2,7 +2,11 @@ package com.asalavei.currencyexchange.api.json;
 
 import java.math.BigDecimal;
 
+/**
+ * JSON DTO for exchange data
+ */
 public class JsonExchange implements JsonDto {
+
     private JsonCurrency baseCurrency;
     private JsonCurrency targetCurrency;
     private BigDecimal rate;
@@ -49,11 +53,20 @@ public class JsonExchange implements JsonDto {
         this.convertedAmount = convertedAmount;
     }
 
+    /**
+     * Creates a new {@link Builder} instance for constructing {@link JsonExchange} instances
+     *
+     * @return a new Builder instance
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Builder for creating instances of the {@link JsonExchange}
+     */
     public static final class Builder {
+
         private JsonCurrency baseCurrency;
         private JsonCurrency targetCurrency;
         private BigDecimal rate;

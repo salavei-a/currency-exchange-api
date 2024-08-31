@@ -5,7 +5,13 @@ import com.asalavei.currencyexchange.api.json.JsonDto;
 
 import java.util.Collection;
 
-public interface JsonDtoConverter<J extends JsonDto, D extends Dto>{
+/**
+ * Converter for converting between {@link JsonDto} and {@link Dto}
+ *
+ * @param <J> the type of {@link JsonDto}
+ * @param <D> the type of {@link Dto}
+ */
+public interface JsonDtoConverter<J extends JsonDto, D extends Dto> {
     D toDto(J jsonDto);
 
     J toJsonDto(D dto);

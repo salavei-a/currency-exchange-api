@@ -1,99 +1,67 @@
 package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityCurrency;
-import com.asalavei.currencyexchange.api.dbaccess.util.ConnectionUtil;
 import com.asalavei.currencyexchange.api.exceptions.*;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Optional;
 
-public class JdbcCurrencyDao implements CurrencyRepository {
+/**
+ * JDBC implementation of the {@link CurrencyRepository}
+ */
+public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements CurrencyRepository {
+
+    private static final String CURRENCY = "currency with code %s";
 
     @Override
     public EntityCurrency save(EntityCurrency entity) {
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     "INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING *"
-             )) {
-            preparedStatement.setString(1, entity.getName());
-            preparedStatement.setString(2, entity.getCode());
-            preparedStatement.setString(3, entity.getSign());
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return getEntityCurrency(resultSet);
-            } else {
-                throw new CEDatabaseUnavailableException("Failed to retrieve generated ID.");
-            }
-        } catch (SQLException e) {
-            if (e.getSQLState().startsWith("23")) {
-                throw new CEAlreadyExists("Currency with the code '" + entity.getCode() + "' already exists.");
-            }
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
-        }
+        return save("INSERT INTO currencies (full_name, code, sign) VALUES (?, ?, ?) RETURNING id, full_name, code, sign",
+                entity.getName(), entity.getCode(), entity.getSign());
     }
 
     @Override
     public Collection<EntityCurrency> findAll() {
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies");
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            Collection<EntityCurrency> currencies = new ArrayList<>();
-
-            while (resultSet.next()) {
-                currencies.add(getEntityCurrency(resultSet));
-            }
-
-            return currencies;
-        } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
-        }
+        return findAll("SELECT id, full_name, code, sign FROM currencies");
     }
 
     @Override
-    public EntityCurrency findByCode(String code) {
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM currencies WHERE code = ?")) {
-            preparedStatement.setString(1, code);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return getEntityCurrency(resultSet);
-            } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, code));
-            }
-        } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
-        }
+    public Optional<EntityCurrency> findByCode(String code) {
+        return findByCode("SELECT id, full_name, code, sign FROM currencies WHERE code = ?", code);
     }
 
     @Override
-    public Integer getIdByCode(String code) {
-        try (Connection connection = ConnectionUtil.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM currencies WHERE code = ?")) {
-            preparedStatement.setString(1, code);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return resultSet.getInt("id");
-            } else {
-                throw new CENotFoundException(String.format(ExceptionMessages.CURRENCY_NOT_FOUND, code));
-            }
-        } catch (SQLException e) {
-            throw new CEDatabaseUnavailableException(ExceptionMessages.DATABASE_OPERATION_FAILED, e);
-        }
-    }
-
-    private EntityCurrency getEntityCurrency(ResultSet resultSet) throws SQLException {
+    protected EntityCurrency extractEntity(ResultSet resultSet) throws SQLException {
         return EntityCurrency.builder()
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("full_name"))
                 .code(resultSet.getString("code"))
                 .sign(resultSet.getString("sign"))
                 .build();
+    }
+
+    @Override
+    protected CERuntimeException createExceptionForEmptyResultSet(String operation, Object... params) {
+        return createDatabaseException(operation, params);
+    }
+
+    @Override
+    protected CERuntimeException createAlreadyExistsException(Object... params) {
+        return new CEAlreadyExists(String.format(ExceptionMessage.ALREADY_EXISTS, String.format(CURRENCY, params[1])));
+    }
+
+    @Override
+    protected CERuntimeException createDatabaseException(String operation, Object... params) {
+        String details;
+
+        switch (operation) {
+            case SAVE_OPERATION -> details = String.format(CURRENCY + " to the database", params[1]);
+            case READ_OPERATION -> details = String.format(CURRENCY + " from the database", params[0]);
+            case READ_ALL_OPERATION -> details = "currencies from the database";
+            default -> throw new CEDatabaseException(ExceptionMessage.ERROR_PROCESSING_REQUEST_TO_DATABASE);
+        }
+
+        return new CEDatabaseException(String.format(ExceptionMessage.FAILED_OPERATION, operation, details));
     }
 }

@@ -1,0 +1,34 @@
+### Exchange - 200 OK
+### Exchange via direct rate
+GET http://localhost:8080/api/exchange?from=USD&to=RUB&amount=1000
+Accept: application/json
+
+### Exchange - 200 OK
+### Exchange via reverse rate
+GET http://localhost:8080/api/exchange?from=RUB&to=USD&amount=1000
+Accept: application/json
+
+### Exchange - 200 OK
+### Exchange via cross currency rate
+GET http://localhost:8080/api/exchange?from=GEL&to=BYN&amount=1000
+Accept: application/json
+
+### Exchange - 400 Bad Request
+### Invalid or missing input data
+GET http://localhost:8080/api/exchange?from=US&to=RUB&amount=1000
+Accept: application/json
+
+### Exchange - 400 Bad Request
+### The currency code must follow the ISO 4217 standard
+GET http://localhost:8080/api/exchange?from=UST&to=RUB&amount=1000
+Accept: application/json
+
+### Exchange - 400 Bad Request
+### Invalid input data: base and target currencies are the same
+GET http://localhost:8080/api/exchange?from=RUB&to=RUB&amount=1000
+Accept: application/json
+
+### Exchange - 404 Not Found
+### Exchange operation failed. Exchange rate not found in the database
+GET http://localhost:8080/api/exchange?from=CAD&to=RUB&amount=1000
+Accept: application/json

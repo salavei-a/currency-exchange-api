@@ -3,9 +3,10 @@ package com.asalavei.currencyexchange.api.dbaccess.entities;
 import java.math.BigDecimal;
 
 /**
- * Entity representing exchange rate data stored in the database
+ * Entity for exchange rate data
  */
 public class EntityExchangeRate extends BaseEntity<Integer> {
+
     private EntityCurrency baseCurrency;
     private EntityCurrency targetCurrency;
     private BigDecimal rate;
@@ -47,6 +48,7 @@ public class EntityExchangeRate extends BaseEntity<Integer> {
      * Builder for creating instances of the {@link EntityExchangeRate}
      */
     public static final class Builder {
+
         private Integer id;
         private EntityCurrency baseCurrency;
         private EntityCurrency targetCurrency;

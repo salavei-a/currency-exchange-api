@@ -1,7 +1,7 @@
 package com.asalavei.currencyexchange.api.dto;
 
 /**
- * Immutable DTO for transferring currency data between business logic layers
+ * DTO for currency data
  */
 public class Currency extends BaseDto<Integer> {
     private final String name;
@@ -40,6 +40,7 @@ public class Currency extends BaseDto<Integer> {
      * Builder for creating instances of the {@link Currency}
      */
     public static final class Builder {
+
         private Integer id;
         private String name;
         private String code;

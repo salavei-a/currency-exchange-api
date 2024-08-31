@@ -1,0 +1,46 @@
+# Shut down the database before sending requests
+
+### Get all currencies - 500 Internal Server Error
+GET http://localhost:8080/api/currencies
+Accept: application/json
+
+### Create currency - 500 Internal Server Error
+POST http://localhost:8080/api/currencies
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+name=Pound Sterling &
+code=GBP &
+sign=£
+
+### Get currency by code - 500 Internal Server Error
+GET http://localhost:8080/api/currency/EUR
+Accept: application/json
+
+### Get all exchange rate - 500 Internal Server Error
+GET http://localhost:8080/api/exchangeRates
+Accept: application/json
+
+### Get exchange rate by currency codes - 500 Internal Server Error
+GET http://localhost:8080/api/exchangeRate/USDGEL
+Accept: application/json
+
+### Create exchange rate - 500 Internal Server Error
+POST http://localhost:8080/api/exchangeRates
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+baseCurrencyCode=GEL &
+targetCurrencyCode=BYN &
+rate=1.212499
+
+### Update exchange rate - 500 Internal Server Error
+PATCH http://localhost:8080/api/exchangeRate/USDRUB
+Accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+rate=91.496732
+
+### Exchange - 500 Internal Server Error
+GET http://localhost:8080/api/exchange?from=USD&to=RUB&amount=100
+Accept: application/json

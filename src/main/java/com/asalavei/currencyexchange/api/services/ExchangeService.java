@@ -1,80 +1,88 @@
 package com.asalavei.currencyexchange.api.services;
 
-import com.asalavei.currencyexchange.api.dbaccess.converters.EntityCurrencyConverter;
-import com.asalavei.currencyexchange.api.dbaccess.repositories.CurrencyRepository;
+import com.asalavei.currencyexchange.api.dbaccess.converters.EntityExchangeRateConverter;
+import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 import com.asalavei.currencyexchange.api.dbaccess.repositories.ExchangeRateRepository;
-import com.asalavei.currencyexchange.api.dto.Currency;
 import com.asalavei.currencyexchange.api.dto.Exchange;
+import com.asalavei.currencyexchange.api.dto.ExchangeRate;
+import com.asalavei.currencyexchange.api.exceptions.CEDatabaseException;
 import com.asalavei.currencyexchange.api.exceptions.CENotFoundException;
-import com.asalavei.currencyexchange.api.exceptions.ExceptionMessages;
+import com.asalavei.currencyexchange.api.exceptions.ExceptionMessage;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
+import static java.math.MathContext.DECIMAL64;
+
+/**
+ * Service for handling currency exchange operations
+ */
 public class ExchangeService implements Service {
-    private final CurrencyRepository currencyRepository;
-    private final ExchangeRateRepository exchangeRateRepository;
-    private final EntityCurrencyConverter converter;
-    private final String crossCurrencyCode;
-    private Integer crossCurrencyId;
 
-    public ExchangeService(CurrencyRepository currencyRepository, ExchangeRateRepository exchangeRateRepository, EntityCurrencyConverter converter, String crossCurrencyCode) {
-        this.currencyRepository = currencyRepository;
+    private final ExchangeRateRepository exchangeRateRepository;
+    private final EntityExchangeRateConverter converter;
+    private final String crossCurrencyCode;
+
+    public ExchangeService(ExchangeRateRepository exchangeRateRepository, EntityExchangeRateConverter converter, String crossCurrencyCode) {
         this.exchangeRateRepository = exchangeRateRepository;
         this.converter = converter;
         this.crossCurrencyCode = crossCurrencyCode;
     }
 
-    public Exchange exchange(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
-        Currency baseCurrency = converter.toDto(currencyRepository.findByCode(baseCurrencyCode));
-        Currency targetCurrency = converter.toDto(currencyRepository.findByCode(targetCurrencyCode));
-        BigDecimal rate = getExchangeRate(baseCurrency, targetCurrency);
+    public Exchange exchange(Exchange dto) {
+        try {
+            EntityExchangeRate entityExchangeRate = findExchangeRate(dto)
+                    .orElseThrow(() -> new CENotFoundException(String.format(ExceptionMessage.EXCHANGE_RATE_NOT_FOUND,
+                            dto.getBaseCurrency().getCode(), dto.getTargetCurrency().getCode())));
 
-        return Exchange.builder()
-                .baseCurrency(baseCurrency)
-                .targetCurrency(targetCurrency)
-                .rate(rate)
-                .amount(amount)
-                .convertedAmount(exchange(amount, rate))
-                .build();
+            ExchangeRate exchangeRate = converter.toDto(entityExchangeRate);
+            BigDecimal amount = dto.getAmount();
+
+            return Exchange.builder()
+                    .baseCurrency(exchangeRate.getBaseCurrency())
+                    .targetCurrency(exchangeRate.getTargetCurrency())
+                    .rate(exchangeRate.getRate())
+                    .amount(amount)
+                    .convertedAmount(exchange(amount, entityExchangeRate.getRate()))
+                    .build();
+        } catch (CENotFoundException e) {
+            throw new CENotFoundException(String.format(ExceptionMessage.EXCHANGE_FAILED, e.getMessage()));
+        } catch (CEDatabaseException e) {
+            throw new CEDatabaseException(String.format(ExceptionMessage.EXCHANGE_FAILED, e.getMessage()));
+        }
     }
 
     private BigDecimal exchange(BigDecimal amount, BigDecimal rate) {
-        return amount.multiply(rate).setScale(2, RoundingMode.HALF_UP);
+        return amount.multiply(rate).setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    private BigDecimal getExchangeRate(Currency baseCurrency, Currency targetCurrency) {
-        try {
-            return exchangeRateRepository.getRateByCurrencyPairIds(baseCurrency.getId(), targetCurrency.getId());
-        } catch (CENotFoundException e) {
-            return getRateFromReverseOrCrossCurrency(baseCurrency, targetCurrency);
-        }
-
+    private Optional<EntityExchangeRate> findExchangeRate(Exchange dto) {
+        return findByDirectRate(dto)
+                .or(() -> findByReverseRate(dto))
+                .or(() -> findByCrossCurrency(dto));
     }
 
-    private BigDecimal getRateFromReverseOrCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
-        try {
-            BigDecimal reverseRate = exchangeRateRepository.getRateByCurrencyPairIds(targetCurrency.getId(), baseCurrency.getId());
-            return BigDecimal.ONE.divide(reverseRate, 6, RoundingMode.HALF_UP);
-        } catch (CENotFoundException e) {
-            return getRateViaCrossCurrency(baseCurrency, targetCurrency);
-        }
+    private Optional<EntityExchangeRate> findByDirectRate(Exchange dto) {
+        return exchangeRateRepository.findByCurrencyCodes(dto.getBaseCurrency().getCode(), dto.getTargetCurrency().getCode());
     }
 
-    private BigDecimal getRateViaCrossCurrency(Currency baseCurrency, Currency targetCurrency) {
-        ensureCrossCurrencyId();
-        try {
-            BigDecimal crossToBaseCurrencyRate = exchangeRateRepository.getRateByCurrencyPairIds(crossCurrencyId, baseCurrency.getId());
-            BigDecimal crossToTargetCurrencyRate = exchangeRateRepository.getRateByCurrencyPairIds(crossCurrencyId, targetCurrency.getId());
-            return crossToTargetCurrencyRate.divide(crossToBaseCurrencyRate, 6, RoundingMode.HALF_UP);
-        } catch (CENotFoundException exception) {
-            throw new CENotFoundException(ExceptionMessages.EXCHANGE_RATE_NOT_FOUND);
-        }
+    private Optional<EntityExchangeRate> findByReverseRate(Exchange dto) {
+        return exchangeRateRepository.findByCurrencyCodes(dto.getTargetCurrency().getCode(), dto.getBaseCurrency().getCode())
+                .map(reverseRate -> EntityExchangeRate.builder()
+                                     .baseCurrency(reverseRate.getTargetCurrency())
+                                     .targetCurrency(reverseRate.getBaseCurrency())
+                                     .rate(BigDecimal.ONE.divide(reverseRate.getRate(), DECIMAL64).setScale(6, RoundingMode.HALF_EVEN))
+                                     .build());
     }
 
-    private void ensureCrossCurrencyId() {
-        if (this.crossCurrencyId == null) {
-            this.crossCurrencyId = currencyRepository.getIdByCode(crossCurrencyCode);
-        }
+    private Optional<EntityExchangeRate> findByCrossCurrency(Exchange dto) {
+        return exchangeRateRepository.findByCurrencyCodes(crossCurrencyCode, dto.getBaseCurrency().getCode())
+                .flatMap(crossToBase -> exchangeRateRepository.findByCurrencyCodes(crossCurrencyCode, dto.getTargetCurrency().getCode())
+                .map(crossToTarget -> EntityExchangeRate.builder()
+                                       .baseCurrency(crossToBase.getTargetCurrency())
+                                       .targetCurrency(crossToTarget.getTargetCurrency())
+                                       .rate(crossToTarget.getRate().divide(crossToBase.getRate(), DECIMAL64).setScale(6, RoundingMode.HALF_EVEN))
+                                       .build()));
     }
 }

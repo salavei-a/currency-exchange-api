@@ -2,12 +2,13 @@ package com.asalavei.currencyexchange.api.dbaccess.repositories;
 
 import com.asalavei.currencyexchange.api.dbaccess.entities.EntityExchangeRate;
 
-import java.math.BigDecimal;
+import java.util.Optional;
 
+/**
+ * Repository for accessing exchange rate entities
+ */
 public interface ExchangeRateRepository extends Repository<EntityExchangeRate> {
-    EntityExchangeRate findByCurrencyPairCodes(String baseCurrencyCode, String targetCurrencyCode);
+    Optional<EntityExchangeRate> findByCurrencyCodes(String baseCurrencyCode, String targetCurrencyCode);
 
-    BigDecimal getRateByCurrencyPairIds(Integer baseCurrencyId, Integer targetCurrencyId);
-
-    EntityExchangeRate updateRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate);
+    EntityExchangeRate update(EntityExchangeRate entity);
 }

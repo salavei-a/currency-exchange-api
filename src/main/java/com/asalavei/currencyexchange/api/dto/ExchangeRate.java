@@ -3,9 +3,10 @@ package com.asalavei.currencyexchange.api.dto;
 import java.math.BigDecimal;
 
 /**
- * Immutable DTO for transferring exchange rate data between business logic layers
+ * DTO for exchange rate data
  */
 public class ExchangeRate extends BaseDto<Integer> {
+
     private final Currency baseCurrency;
     private final Currency targetCurrency;
     private final BigDecimal rate;
@@ -42,6 +43,7 @@ public class ExchangeRate extends BaseDto<Integer> {
      * Builder for creating instances of the {@link ExchangeRate}
      */
     public static final class Builder {
+
         private Integer id;
         private Currency baseCurrency;
         private Currency targetCurrency;

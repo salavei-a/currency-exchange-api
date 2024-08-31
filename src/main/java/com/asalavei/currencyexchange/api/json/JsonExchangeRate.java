@@ -3,9 +3,10 @@ package com.asalavei.currencyexchange.api.json;
 import java.math.BigDecimal;
 
 /**
- * DTO representing exchange rate data that can be serialized to and deserialized from JSON
+ * JSON DTO for exchange rate data
  */
 public class JsonExchangeRate extends BaseJsonDto<Integer> {
+
     private JsonCurrency baseCurrency;
     private JsonCurrency targetCurrency;
     private BigDecimal rate;
@@ -35,7 +36,7 @@ public class JsonExchangeRate extends BaseJsonDto<Integer> {
     }
 
     /**
-     * Creates a new {@link Builder} instance for constructing {@link JsonExchangeRate} instances
+     * Creates a new {@link Builder} instance for constructing {@link JsonExchangeRate} instance
      *
      * @return a new Builder instance
      */
@@ -47,6 +48,7 @@ public class JsonExchangeRate extends BaseJsonDto<Integer> {
      * Builder for creating instances of the {@link JsonExchangeRate}
      */
     public static final class Builder {
+
         private Integer id;
         private JsonCurrency baseCurrency;
         private JsonCurrency targetCurrency;

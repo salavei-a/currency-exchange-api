@@ -1,9 +1,10 @@
 package com.asalavei.currencyexchange.api.dbaccess.entities;
 
 /**
- * Entity representing currency data stored in the database
+ * Entity for currency data
  */
 public class EntityCurrency extends BaseEntity<Integer> {
+
     private String name;
     private String code;
     private String sign;
@@ -45,6 +46,7 @@ public class EntityCurrency extends BaseEntity<Integer> {
      * Builder for creating instances of the {@link EntityCurrency}
      */
     public static final class Builder {
+
         private Integer id;
         private String name;
         private String code;
