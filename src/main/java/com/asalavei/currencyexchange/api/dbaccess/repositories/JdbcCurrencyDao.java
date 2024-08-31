@@ -23,7 +23,7 @@ public class JdbcCurrencyDao extends BaseJdbcDao<EntityCurrency> implements Curr
 
     @Override
     public Collection<EntityCurrency> findAll() {
-        return findAll("SELECT id, full_name, code, sign FROM currencies");
+        return findAll("SELECT id, full_name, code, sign FROM currencies ORDER BY id");
     }
 
     @Override
