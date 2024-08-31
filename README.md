@@ -249,18 +249,18 @@ development and testing purposes on a local machine.
 
 **Key Points:**
 
-- **Docker Containers:** The local startup configuration includes Docker containers for a test frontend located in
-  the [`frontend`](./frontend) directory and PostgreSQL.
-- **Tomcat:** You will need to install and configure Tomcat manually or run it using Intellij Idea
+- **Docker Containers:** The local startup configuration includes Docker containers for a test frontend using Nginx,
+  located in the [`frontend`](./frontend) directory and PostgreSQL.
+- **Tomcat:** You will need to install and configure Tomcat manually or run it using IntelliJ IDEA.
 
-**Steps to Run the Project Locally:**
+**Steps to Run the project locally:**
 
-1. Ensure you have Docker and Docker Compose installed locally/on server.
+1. Ensure you have Docker and Docker Compose installed.
 2. Open your terminal in the project's root directory and run the following command to start the Docker containers in
    detached mode:
    ```bash
    docker-compose up -d
-3. Run Tomcat using Intellij Idea
+3. Run Tomcat using IntelliJ IDEA.
 
 You can also use Docker Desktop for convenience.
 
@@ -288,10 +288,10 @@ const host = "http://your-server-ip:port/api";
 
 **Important Note:**
 
-If you use my [forward Nginx configuration](forward) then the port will be 8888; otherwise, it will be 8181
+If you use my [forward Nginx configuration](forward) on your server then the port will be 8888; otherwise, it will be 8181
 as specified in the docker-compose configuration.
 
-**Steps to deploy on a server:**
+**Steps to Deploy on a server:**
 
 1. Ensure you have Docker and Docker Compose installed on your server.
 2. Copy `docker-compose.prod.yml`, `.env` and `frontend` folder to your server.
