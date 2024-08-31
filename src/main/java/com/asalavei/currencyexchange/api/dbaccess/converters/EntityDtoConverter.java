@@ -7,6 +7,9 @@ import java.util.Collection;
 
 /**
  * Converter for converting between {@link Entity} and {@link Dto}
+ *
+ * @param <E> the type of {@link Entity}
+ * @param <D> the type of {@link Dto}
  */
 public interface EntityDtoConverter<E extends Entity, D extends Dto> {
     E toEntity(D dto);

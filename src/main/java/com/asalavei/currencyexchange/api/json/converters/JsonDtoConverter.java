@@ -7,6 +7,9 @@ import java.util.Collection;
 
 /**
  * Converter for converting between {@link JsonDto} and {@link Dto}
+ *
+ * @param <J> the type of {@link JsonDto}
+ * @param <D> the type of {@link Dto}
  */
 public interface JsonDtoConverter<J extends JsonDto, D extends Dto> {
     D toDto(J jsonDto);
