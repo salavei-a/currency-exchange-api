@@ -8,10 +8,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    env_file:
+      - .env
     ports:
       - "4679:5432"
 
