@@ -29,6 +29,6 @@ services:
     container_name: currency-exchange-frontend-nginx
     image: nginx:1-alpine
     ports:
-      - 80:80
+      - "80:80"
     volumes:
       - ./frontend/:/usr/share/nginx/html
